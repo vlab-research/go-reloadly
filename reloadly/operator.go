@@ -1,6 +1,10 @@
 package reloadly
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+	"strconv"
+)
 
 type Country struct {
 	IsoName string `json:"isoName,omitempty"`
@@ -11,6 +15,35 @@ type Fx struct {
 	Rate         float64 `json:"rate,omitempty"`
 	CurrencyCode string  `json:"currencyCode,omitempty"`
 }
+
+type SuggestedAmount struct {
+	Pay float64
+	Sent float64
+}
+
+type SuggestedAmountsMap []SuggestedAmount
+
+func (s *SuggestedAmountsMap) UnmarshalJSON(b []byte) error {
+	var m map[string]float64
+	err := json.Unmarshal(b, &m)
+	if err != nil {
+		return err
+	}
+
+	res := []SuggestedAmount{}
+
+	for payStr, sent := range m {
+		pay, err := strconv.ParseFloat(payStr, 64)
+		if err != nil {
+			return err
+		}
+		res = append(res, SuggestedAmount{pay, sent})
+	}
+
+	*s = SuggestedAmountsMap(res)
+	return nil
+}
+
 
 type Operator struct {
 	OperatorID                int64       `json:"operatorId,omitempty"`
@@ -43,16 +76,56 @@ type Operator struct {
 	// LocalFixedAmountsDescriptions struct {
 	// } `json:"localFixedAmountsDescriptions,omitempty"`
 	SuggestedAmounts          []float64 `json:"suggestedAmounts,omitempty"`
-	// SuggestedAmountsMap struct {
-	// } `json:"suggestedAmountsMap,omitempty"`
+	SuggestedAmountsMap       SuggestedAmountsMap `json:"suggestedAmountsMap,omitempty"`
 	// Promotions []interface{} `json:"promotions,omitempty"`
 }
 
 
-func (s *Service) AutoDetect(mobile, country string) (*Operator, error) {
+type OperatorsParams struct {
+    SuggestedAmounts    bool `url:"suggestedAmounts,omitempty"`
+    SuggestedAmountsMap bool `url:"suggestedAmountsMap,omitempty"`
+	IncludeBundles      bool `url:"includeBundles,omitempty"`
+	IncludeData         bool `url:"includeData,omitempty"`
+	IncludePin          bool `url:"includePin,omitempty"`
+}
+
+
+func (s *Service) OperatorsAutoDetect(mobile, country string) (*Operator, error) {
 	path := fmt.Sprintf("/operators/auto-detect/phone/%v/countries/%v", mobile, country)
 
+	params := &OperatorsParams{SuggestedAmountsMap: true}
 	resp := new(Operator)
-	err := s.Request("GET", path, new(struct{}), resp)
+	_, err := s.Request("GET", path, params, resp)
 	return resp, err
+}
+
+
+func (s *Service) OperatorsByCountry(country string) ([]Operator, error) {
+	path := fmt.Sprintf("/operators/countries/%v", country)
+	resp := new([]Operator)
+
+
+	params := &OperatorsParams{SuggestedAmountsMap: true}
+
+	_, err := s.Request("GET", path, params, resp)
+	return *resp, err
+}
+
+func (s *Service) SearchOperator(country, name string) (*Operator, error) {
+	ops, err := s.OperatorsByCountry(country)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, op := range ops {
+		if op.Name == name {
+			return &op, nil
+		}
+	}
+
+	err = ReloadlyError{
+		"OPERATOR_NOT_FOUND",
+		fmt.Sprintf("Could not find operator with name: %v in country: %v", name, country),
+	}
+	return nil, err
 }

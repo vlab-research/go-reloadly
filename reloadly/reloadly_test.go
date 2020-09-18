@@ -24,7 +24,7 @@ func TestRequestGetNoQueryParams(t *testing.T) {
 	svc := &Service{}
 
 	resp := new(struct{Bar string})
-	err := svc.request(testSling, "GET", "/foo", new(struct{}), resp)
+	_, err := svc.request(testSling, "GET", "/foo", new(struct{}), resp)
 
 	assert.Nil(t, err)
 	assert.Equal(t, "baz", resp.Bar)
@@ -43,10 +43,10 @@ func TestRequestGetReturnsErrors(t *testing.T) {
 	svc := &Service{}
 
 	resp := new(struct{Bar string})
-	err := svc.request(testSling, "GET", "/foo", new(struct{}), resp)
+	_, err := svc.request(testSling, "GET", "/foo", new(struct{}), resp)
 
 	assert.NotNil(t, err)
-	e, ok := err.(*ErrorResponse)
+	e, ok := err.(APIError)
 
 	assert.True(t, ok)
 	assert.NotNil(t, e)

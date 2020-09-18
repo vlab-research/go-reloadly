@@ -14,7 +14,7 @@ import (
 func TestGetAuthTokenMakesAudience(t *testing.T) {
 	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request){
 
-		expected := fmt.Sprintf(`{"client_id":"id","client_secret":"secret","audience":"http://%v","grant_type":"client_credentials"}`, r.Host)
+		expected := `{"client_id":"id","client_secret":"secret","audience":"reloadly.com","grant_type":"client_credentials"}`
 
 		data, err := ioutil.ReadAll(r.Body)
 
@@ -28,7 +28,7 @@ func TestGetAuthTokenMakesAudience(t *testing.T) {
 	})
 
 
-	svc := &Service{AuthUrl: ts.URL, Client: &http.Client{}}
+	svc := &Service{AuthUrl: ts.URL, BaseUrl: "reloadly.com", Client: &http.Client{}}
 
 	err := svc.Auth("id", "secret")
 	assert.Nil(t, err)
@@ -45,11 +45,11 @@ func TestGetAuthTokenReturnsErrors(t *testing.T) {
 		fmt.Fprint(w, `{"timeStamp": "2020-09-18T08:26:27.577+0000", "message": "Access Denied", "path": "/oauth/token", "errorCode": "INVALID_CREDENTIALS", "infoLink": null, "details": []}`)
 	})
 
-	svc := &Service{AuthUrl: ts.URL, Client: &http.Client{}}
+	svc := &Service{AuthUrl: ts.URL, BaseUrl: "reloadly.com", Client: &http.Client{}}
 
 	err := svc.Auth("id", "secret")
 	assert.NotNil(t, err)
-	e, ok := err.(*ErrorResponse)
+	e, ok := err.(APIError)
 
 	assert.True(t, ok)
 	assert.NotNil(t, e)

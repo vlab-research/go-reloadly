@@ -2,6 +2,9 @@ package reloadly
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
+	"sort"
 )
 
 type TopupResponse struct {
@@ -41,6 +44,20 @@ type TopupRequest struct {
 	CustomIdentifier string `json:"customIdentifier,omitempty"`
 }
 
+
+func pickAmount(amounts []SuggestedAmount, min float64, tolerance float64) (*SuggestedAmount, error) {
+	sort.Slice(amounts, func(i, j int) bool { return amounts[i].Sent < amounts[j].Sent})
+
+	for _, a := range amounts {
+		if a.Sent >= min && a.Sent <= min + tolerance {
+			return &a, nil
+		}
+	}
+
+	return nil, errors.New("no amount found")
+}
+
+
 func (s *Service) Topup(id, mobile string, operator *Operator, amount float64) (*TopupResponse, error) {
 	req := &TopupRequest{
 		RecipientPhone: RecipientPhone{operator.Country.IsoName, mobile},
@@ -50,15 +67,26 @@ func (s *Service) Topup(id, mobile string, operator *Operator, amount float64) (
 	}
 
 	resp := new(TopupResponse)
-	err := s.Request("POST", "/topups", req, resp)
+	_, err := s.Request("POST", "/topups", req, resp)
 	return resp, err
 }
 
-func (s *Service) AutoTopup(id, mobile, country string, amount float64) (*TopupResponse, error) {
-	op, err := s.AutoDetect(mobile, country)
+func (s *Service) TopupBySuggestedAmount(
+	id, mobile string,
+	operator *Operator,
+	amount float64,
+	tolerance float64) (*TopupResponse, error) {
+
+	amounts := operator.SuggestedAmountsMap
+	amt, err := pickAmount(amounts, amount, tolerance)
+
 	if err != nil {
+		err = ReloadlyError{
+			ErrorCode: "IMPOSSIBLE_AMOUNT",
+			Message: fmt.Sprintf("Could not manage to find an amount of at least %v for operator %v with suggested amounts %v", amount, operator.Name, amounts),
+		}
 		return nil, err
 	}
 
-	return s.Topup(id, mobile, op, amount)
+	return s.Topup(id, mobile, operator, amt.Pay)
 }

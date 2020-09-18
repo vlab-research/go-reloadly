@@ -17,12 +17,12 @@ type Token struct {
 }
 
 func (s *Service) GetOAuthToken(clientId, clientSecret string) (*Token, error){
-	body := &OAuthRequest{clientId, clientSecret, s.AuthUrl, "client_credentials"}
+	body := &OAuthRequest{clientId, clientSecret, s.BaseUrl, "client_credentials"}
 	token := new(Token)
 
 	sli := sling.New().Client(s.Client).Base(s.AuthUrl)
 
-	err := s.request(sli, "POST", "oauth/token", body, token)
+	_, err := s.request(sli, "POST", "oauth/token", body, token)
 	return token, err
 }
 
