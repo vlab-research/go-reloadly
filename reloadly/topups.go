@@ -1,29 +1,29 @@
 package reloadly
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"sort"
 )
 
+
 type TopupResponse struct {
-	TransactionId int64 `json:"transactionId,omitempty"`
-	OperatorTransactionId int64 `json:"operatorTransactionId,omitempty"`
-	CustomIdentifier string `json:"customIdentifier,omitempty"`
-	RecipientPhone string `json:"recipientPhone,omitempty"`
-	SenderPhone string `json:"senderPhone,omitempty"`
-	CountryCode string `json:"countryCode,omitempty"`
-	OperatorId int64 `json:"operatorId,omitempty"`
-	OperatorName string `json:"operatorName,omitempty"`
-	Discount float64 `json:"discount,omitempty"`
-	DiscountCurrencyCode string `json:"discountCurrencyCode,omitempty"`
-	RequestedAmount float64 `json:"requestedAmount,omitempty"`
-	RequestedAmountCurrencyCode string `json:"requestedAmountCurrencyCode,omitempty"`
-	DeliveredAmount float64 `json:"deliveredAmount,omitempty"`
-	DeliveredAmountCurrencyCode string `json:"deliveredAmountCurrencyCode,omitempty"`
-	TransactionDate string `json:"transactionDate,omitempty"`
-	PinDetail *json.RawMessage `json:"pinDetail,omitempty"`
+	TransactionID               int64       `json:"transactionId,omitempty"`
+	OperatorTransactionID       string      `json:"operatorTransactionId,omitempty"`
+	CustomIdentifier            string      `json:"customIdentifier,omitempty"`
+	RecipientPhone              string      `json:"recipientPhone,omitempty"`
+	RecipientEmail              string      `json:"recipientEmail,omitempty"`
+	SenderPhone                 string      `json:"senderPhone,omitempty"`
+	CountryCode                 string      `json:"countryCode,omitempty"`
+	OperatorID                  int64       `json:"operatorId,omitempty"`
+	OperatorName                string      `json:"operatorName,omitempty"`
+	Discount                    float64     `json:"discount,omitempty"`
+	DiscountCurrencyCode        string      `json:"discountCurrencyCode,omitempty"`
+	RequestedAmount             float64     `json:"requestedAmount,omitempty"`
+	RequestedAmountCurrencyCode string      `json:"requestedAmountCurrencyCode,omitempty"`
+	DeliveredAmount             float64     `json:"deliveredAmount,omitempty"`
+	DeliveredAmountCurrencyCode string      `json:"deliveredAmountCurrencyCode,omitempty"`
+	TransactionDate             string      `json:"transactionDate,omitempty"`
 }
 
 type RecipientPhone struct {
@@ -37,8 +37,8 @@ type SenderPhone struct {
 }
 
 type TopupRequest struct {
-	RecipientPhone   RecipientPhone `json:"recipientPhone,omitempty"`
-	SenderPhone      SenderPhone `json:"senderPhone,omitempty"`
+	RecipientPhone   *RecipientPhone `json:"recipientPhone,omitempty"`
+	SenderPhone      *SenderPhone `json:"senderPhone,omitempty"`
 	OperatorID       int64    `json:"operatorId,omitempty"`
 	Amount           float64    `json:"amount,omitempty"`
 	CustomIdentifier string `json:"customIdentifier,omitempty"`
@@ -60,10 +60,9 @@ func pickAmount(amounts []SuggestedAmount, min float64, tolerance float64) (*Sug
 
 func (s *Service) Topup(id, mobile string, operator *Operator, amount float64) (*TopupResponse, error) {
 	req := &TopupRequest{
-		RecipientPhone: RecipientPhone{operator.Country.IsoName, mobile},
+		RecipientPhone: &RecipientPhone{operator.Country.IsoName, mobile},
 		OperatorID: operator.OperatorID,
 		Amount: amount,
-		CustomIdentifier: id,
 	}
 
 	resp := new(TopupResponse)
