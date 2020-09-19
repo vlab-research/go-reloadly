@@ -2,12 +2,13 @@ package reloadly
 
 import (
 	"fmt"
-	// "io/ioutil"
+
 	"net/http"
-	// "strings"
+
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/dghubble/sling"
 )
 
 
@@ -51,4 +52,20 @@ func TestRequestGetReturnsErrors(t *testing.T) {
 	assert.True(t, ok)
 	assert.NotNil(t, e)
 	assert.Equal(t, e.ErrorCode, "INVALID_CREDENTIALS")
+}
+
+
+func TestRequestGetReturnsErrorsOnHttpError(t *testing.T) {
+
+	svc := &Service{}
+	resp := new(struct{Bar string})
+	_, err := svc.request(sling.New().Client(&http.Client{}).Base("http://foo"), "GET", "/foo", new(struct{}), resp)
+
+	assert.NotNil(t, err)
+	_, ok := err.(APIError)
+
+	assert.False(t, ok)
+	t.Log(err)
+	// assert.NotNil(t, e)
+	// assert.Equal(t, e.ErrorCode, "INVALID_CREDENTIALS")
 }

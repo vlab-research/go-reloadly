@@ -8,7 +8,6 @@ import (
 	"github.com/dghubble/sling"
 )
 
-
 type Service struct {
 	Client *http.Client
 	BaseUrl string
@@ -25,13 +24,8 @@ func New() *Service {
 	}
 }
 
-func NewSandbox() *Service {
-	return &Service{
-		http.DefaultClient,
-		"https://topups-sandbox.reloadly.com",
-		"https://auth.reloadly.com",
-		nil,
-	}
+func (s *Service) Sandbox() {
+	s.BaseUrl = "https://topups-sandbox.reloadly.com"
 }
 
 func (s *Service) request(sli *sling.Sling, method, path string, params interface{}, resp interface{}) (*http.Response, error) {
@@ -44,24 +38,37 @@ func (s *Service) request(sli *sling.Sling, method, path string, params interfac
 
 	apiError := APIError{}
 	httpResponse, err := sli.Receive(resp, &apiError)
-	if err == nil {
-		err = apiError.AsError()
+	if err != nil {
+		return nil, err
 	}
 
-	if err == nil && httpResponse.StatusCode >= 300 {
-		return httpResponse, APIError{
-			Message: fmt.Sprintf("Non-200 Status Code: %v", httpResponse.StatusCode),
-			ErrorCode: fmt.Sprint(httpResponse.StatusCode),
+	status := httpResponse.StatusCode
+
+	if !apiError.Empty() {
+		apiError.StatusCode = status
+		return httpResponse, apiError
+	}
+
+	// Reloadly will send an erro response without
+	// a body, sometimes, so we just create our
+	// own "APIError" from the status.
+	if status < 200 || status > 299 {
+		return httpResponse, &APIError{
+			Message: httpResponse.Status,
+			ErrorCode: fmt.Sprint(status),
+			StatusCode: status,
 		}
 	}
-
-	return httpResponse, err
+	return httpResponse, nil
 }
 
 func (s *Service) Request(method, path string, params interface{}, resp interface{}) (*http.Response, error) {
+
 	sli := sling.New().Client(s.Client).Base(s.BaseUrl).Set("Accept", "application/com.reloadly.topups-v1+json")
+
 	if s.Token != nil {
-		sli = sli.Set("Authorization", fmt.Sprintf("%v %v", s.Token.TokenType, s.Token.AccessToken))
+		auth := fmt.Sprintf("%v %v", s.Token.TokenType, s.Token.AccessToken)
+		sli = sli.Set("Authorization", auth)
 	}
 	return s.request(sli, method, path, params, resp)
 }

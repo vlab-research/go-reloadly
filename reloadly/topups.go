@@ -63,6 +63,7 @@ func (s *Service) Topup(id, mobile string, operator *Operator, amount float64) (
 		RecipientPhone: &RecipientPhone{operator.Country.IsoName, mobile},
 		OperatorID: operator.OperatorID,
 		Amount: amount,
+		CustomIdentifier: id,
 	}
 
 	resp := new(TopupResponse)

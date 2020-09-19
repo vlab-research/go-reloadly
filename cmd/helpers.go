@@ -8,15 +8,14 @@ import (
 )
 
 func LoadService(cmd *cobra.Command) (*reloadly.Service, error) {
-	sb, err := cmd.Flags().GetBool("sandbox")
+	sandbox, err := cmd.Flags().GetBool("sandbox")
 	if err != nil {
 		return nil, err
 	}
-	var svc *reloadly.Service
-	if sb {
-		svc = reloadly.NewSandbox()
-	} else {
-		svc = reloadly.New()
+
+	svc := reloadly.New()
+	if sandbox {
+		svc.Sandbox()
 	}
 
 	err = svc.Auth(os.Getenv("RELOADLY_ID"), os.Getenv("RELOADLY_SECRET"))

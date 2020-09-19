@@ -58,7 +58,7 @@ func TestTopupBySuggestedAmountSendsRequestForGoodAmount(t *testing.T) {
 
 	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request){
 
-		expected := `{"recipientPhone":{"countryCode":"IN","number":"+123"},"senderPhone":{},"operatorId":211,"amount":1.82,"customIdentifier":"foo"}`
+		expected := `{"recipientPhone":{"countryCode":"IN","number":"+123"},"operatorId":211,"amount":1.82,"customIdentifier":"foo"}`
 
 		data, _ := ioutil.ReadAll(r.Body)
 		dat := strings.TrimSpace(string(data))

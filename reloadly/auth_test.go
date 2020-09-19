@@ -23,6 +23,7 @@ func TestGetAuthTokenMakesAudience(t *testing.T) {
 		assert.Equal(t, "/oauth/token", r.URL.Path)
 		assert.Equal(t, expected, dat)
 
+		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintf(w, `{"token_type": "Bearer", "access_token": "foobarbaz", "expires_in": 86400, "scope": "foo bar baz"}`)
 	})
@@ -54,4 +55,5 @@ func TestGetAuthTokenReturnsErrors(t *testing.T) {
 	assert.True(t, ok)
 	assert.NotNil(t, e)
 	assert.Equal(t, e.ErrorCode, "INVALID_CREDENTIALS")
+	assert.Equal(t, e.StatusCode, 401)
 }
