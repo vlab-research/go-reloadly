@@ -4,26 +4,52 @@ import (
 	"errors"
 	"fmt"
 	"sort"
+	"strings"
+	"time"
 )
 
 
+type TransactionDate time.Time
+
+func (t *TransactionDate) UnmarshalJSON(b []byte) error {
+	format := "2006-01-02 15:04:05"
+	s := strings.Trim(string(b), "\"")
+	parsed, err := time.Parse(format, s)
+	if err != nil {
+		return err
+	}
+	*t = TransactionDate(parsed)
+	return nil
+}
+
+func (t *TransactionDate) MarshalJSON() ([]byte, error) {
+	format := "2006-01-02 15:04:05"
+	s := time.Time(*t).Format(format)
+	return []byte(s), nil
+}
+
+func (t *TransactionDate) MarshalCSV() ([]byte, error) {
+	return t.MarshalJSON()
+}
+
+
 type TopupResponse struct {
-	TransactionID               int64       `csv:"transactionId" json:"transactionId,omitempty"`
-	OperatorTransactionID       string      `csv:"operatorTransactionId" json:"operatorTransactionId,omitempty"`
-	CustomIdentifier            string      `csv:"customIdentifier" json:"customIdentifier,omitempty"`
-	RecipientPhone              string      `csv:"recipientPhone" json:"recipientPhone,omitempty"`
-	RecipientEmail              string      `csv:"recipientEmail" json:"recipientEmail,omitempty"`
-	SenderPhone                 string      `csv:"senderPhone" json:"senderPhone,omitempty"`
-	CountryCode                 string      `csv:"countryCode" json:"countryCode,omitempty"`
-	OperatorID                  int64       `csv:"operatorId" json:"operatorId,omitempty"`
-	OperatorName                string      `csv:"operatorName" json:"operatorName,omitempty"`
-	Discount                    float64     `csv:"discount" json:"discount,omitempty"`
-	DiscountCurrencyCode        string      `csv:"discountCurrencyCode" json:"discountCurrencyCode,omitempty"`
-	RequestedAmount             float64     `csv:"requestedAmount" json:"requestedAmount,omitempty"`
-	RequestedAmountCurrencyCode string      `csv:"requestedAmountCurrencyCode" json:"requestedAmountCurrencyCode,omitempty"`
-	DeliveredAmount             float64     `csv:"deliveredAmount" json:"deliveredAmount,omitempty"`
-	DeliveredAmountCurrencyCode string      `csv:"deliveredAmountCurrencyCode" json:"deliveredAmountCurrencyCode,omitempty"`
-	TransactionDate             string      `csv:"transactionDate" json:"transactionDate,omitempty"`
+	TransactionID               int64            `csv:"transactionId" json:"transactionId,omitempty"`
+	OperatorTransactionID       string           `csv:"operatorTransactionId" json:"operatorTransactionId,omitempty"`
+	CustomIdentifier            string           `csv:"customIdentifier" json:"customIdentifier,omitempty"`
+	RecipientPhone              string           `csv:"recipientPhone" json:"recipientPhone,omitempty"`
+	RecipientEmail              string           `csv:"recipientEmail" json:"recipientEmail,omitempty"`
+	SenderPhone                 string           `csv:"senderPhone" json:"senderPhone,omitempty"`
+	CountryCode                 string           `csv:"countryCode" json:"countryCode,omitempty"`
+	OperatorID                  int64            `csv:"operatorId" json:"operatorId,omitempty"`
+	OperatorName                string           `csv:"operatorName" json:"operatorName,omitempty"`
+	Discount                    float64          `csv:"discount" json:"discount,omitempty"`
+	DiscountCurrencyCode        string           `csv:"discountCurrencyCode" json:"discountCurrencyCode,omitempty"`
+	RequestedAmount             float64          `csv:"requestedAmount" json:"requestedAmount,omitempty"`
+	RequestedAmountCurrencyCode string           `csv:"requestedAmountCurrencyCode" json:"requestedAmountCurrencyCode,omitempty"`
+	DeliveredAmount             float64          `csv:"deliveredAmount" json:"deliveredAmount,omitempty"`
+	DeliveredAmountCurrencyCode string           `csv:"deliveredAmountCurrencyCode" json:"deliveredAmountCurrencyCode,omitempty"`
+	TransactionDate             *TransactionDate `csv:"transactionDate" json:"transactionDate,omitempty"`
 }
 
 type RecipientPhone struct {
@@ -54,7 +80,6 @@ type TopupsService struct {
 	tolerance float64
 	error error
 }
-
 
 
 func (s *Service) Topups() *TopupsService {

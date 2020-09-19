@@ -26,23 +26,23 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func LoadBatchCsv(path string) ([]reloadly.TopupDetails, error) {
-	var deets []reloadly.TopupDetails
+func LoadBatchCsv(path string) ([]reloadly.TopupJob, error) {
+	var jobs []reloadly.TopupJob
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
-	err = csvutil.Unmarshal(b, &deets)
+	err = csvutil.Unmarshal(b, &jobs)
 
-	if len(deets) == 0 {
-		return deets, fmt.Errorf("We could not parse the data from the csv. Please ensure it is in the right format and that the required fields (number, amount, country) are present for each row in the csv file.")
+	if len(jobs) == 0 {
+		return jobs, fmt.Errorf("We could not parse the data from the csv. Please ensure it is in the right format and that the required fields (number, amount, country) are present for each row in the csv file.")
 	}
 
-	return deets, nil
+	return jobs, nil
 }
 
-func WriteBatchCsv(path string, responses []*reloadly.BatchTopupResponse) error {
+func WriteBatchCsv(path string, responses []*reloadly.TopupWorkerResponse) error {
 	b, err := csvutil.Marshal(responses)
 	if err != nil {
 		return err
@@ -52,19 +52,19 @@ func WriteBatchCsv(path string, responses []*reloadly.BatchTopupResponse) error 
 	return err
 }
 
-func BatchTopup(svc *reloadly.Service, numWorkers int, deets []reloadly.TopupDetails) []*reloadly.BatchTopupResponse {
-	tt := make([]interface{}, len(deets))
-	for i := range deets {
-		tt[i] = &deets[i]
+func BatchTopup(svc *reloadly.Service, numWorkers int, jobs []reloadly.TopupJob) []*reloadly.TopupWorkerResponse {
+	tt := make([]interface{}, len(jobs))
+	for i := range jobs {
+		tt[i] = &jobs[i]
 	}
 
-	tasks := chance.Channelify(tt)
+	tasks := chance.Flatten(tt)
 	worker := reloadly.TopupWorker(*svc)
 	outputs := chance.Pool(numWorkers, tasks, worker.Work)
 
-	res := []*reloadly.BatchTopupResponse{}
+	res := []*reloadly.TopupWorkerResponse{}
 	for r := range outputs {
-		rr := r.(*reloadly.BatchTopupResponse)
+		rr := r.(*reloadly.TopupWorkerResponse)
 		res = append(res, rr)
 	}
 
