@@ -53,7 +53,7 @@ func (s *Service) request(sli *sling.Sling, method, path string, params interfac
 	// a body, sometimes, so we just create our
 	// own "APIError" from the status.
 	if status < 200 || status > 299 {
-		return httpResponse, &APIError{
+		return httpResponse, APIError{
 			Message: httpResponse.Status,
 			ErrorCode: fmt.Sprint(status),
 			StatusCode: status,

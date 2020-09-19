@@ -1,0 +1,3 @@
+number,amount,country,tolerance,operator
+foo,100,IN,0,
+bar,2.5,IN,,Foodafone India

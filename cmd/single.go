@@ -26,9 +26,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// TopupCmd represents the Topup command
-var TopupCmd = &cobra.Command{
-	Use:   "topup",
+var singleCmd = &cobra.Command{
+	Use:   "single",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -43,50 +42,57 @@ to quickly create a Cobra application.`,
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		mobile := args[0]
+
+		number := args[0]
 		amount, err := strconv.ParseFloat(args[1], 64)
+		if err != nil {
+			return err
+		}
+
 		country := args[2]
 
 		svc, err := LoadService(cmd)
 		if err != nil {
 			return err
 		}
+
 		fmt.Println("Authorized with Reloadly")
 
 		operatorName, err := cmd.Flags().GetString("operator")
 		if err != nil {
 			return err
 		}
+		tolerance, err := cmd.Flags().GetFloat64("tolerance")
+		if err != nil {
+			return err
+		}
 
-		var op *reloadly.Operator
+		var res *reloadly.TopupResponse
+
 		if operatorName != "" {
-			op, err = svc.SearchOperator(country, operatorName)
+			fmt.Println(fmt.Sprintf("Using operator: %v", operatorName))
+			res, err = svc.Topups().FindOperator(country, operatorName).SuggestedAmount(tolerance).AutoFallback().Topup(number, amount)
 		} else {
-			op, err = svc.OperatorsAutoDetect(mobile, country)
-
+			t := svc.Topups()
+			res, err = t.AutoDetect(country).SuggestedAmount(tolerance).Topup(number, amount)
+			fmt.Println(fmt.Sprintf("Autodetected operator: %v", t.GetSetOperator().Name))
 		}
+
 		if err != nil {
 			fmt.Println(err)
 			return nil
 		}
 
-		fmt.Println(fmt.Sprintf("Using operator: %v", op.Name))
-
-		res, err := svc.TopupBySuggestedAmount("cli", mobile, op, amount, 0.0)
-		if err != nil {
-			fmt.Println(err)
-			return nil
-		}
 		fmt.Printf("Topup response: %v", res)
+
 
 		return nil
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(TopupCmd)
+	topupsCmd.AddCommand(singleCmd)
 
-	// TopupCmd.Flags().Float64P("amount", "a", 0.0, "amount for topup")
-	TopupCmd.Flags().Float64P("tolerance", "t", 0.0, "tolerance for topup")
-	TopupCmd.Flags().String("operator", "", "operator")
+	singleCmd.Flags().Float64P("tolerance", "t", 0.0, "tolerance for topup")
+	singleCmd.Flags().String("operator", "", "operator")
 }

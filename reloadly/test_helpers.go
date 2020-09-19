@@ -19,3 +19,9 @@ func TestServer(handler func(http.ResponseWriter, *http.Request)) (*httptest.Ser
 	sli := sling.New().Client(&http.Client{}).Base(ts.URL)
 	return ts, sli
 }
+
+func TestServerMux() (*httptest.Server, *http.ServeMux) {
+	mux := http.NewServeMux()
+	ts := httptest.NewServer(mux)
+	return ts, mux
+}
