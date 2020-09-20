@@ -3,9 +3,9 @@ package reloadly
 type TopupWorker Service
 
 type TopupJob struct {
-	Number    string  `csv:"number" json:"number"`
-	Amount    float64 `csv:"amount" json:"amount"`
-	Country   string  `csv:"country" json:"country"`
+	Number    string  `csv:"number" json:"number" validate:"required"`
+	Amount    float64 `csv:"amount" json:"amount" validate:"required"`
+	Country   string  `csv:"country" json:"country" validate:"required"`
 	Tolerance float64 `csv:"tolerance,omitempty" json:"tolerance,omitempty"`
 	Operator  string  `csv:"operator,omitempty" json:"operator,omitempty"`
 	ID        string  `csv:"id,omitempty" json:"id,omitempty"`
