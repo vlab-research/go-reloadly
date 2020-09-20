@@ -11,9 +11,9 @@ import (
 
 func TestGetOperatorsByCountry(t *testing.T) {
 	dat, _ := ioutil.ReadFile("test/operators.json")
-    operators := string(dat)
+	operators := string(dat)
 
-	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request){
+	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/operators/countries/IN", r.URL.Path)
 
 		w.Header().Set("Content-Type", "application/com.reloadly.topups-v1+json")
@@ -21,7 +21,6 @@ func TestGetOperatorsByCountry(t *testing.T) {
 	})
 
 	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
-
 
 	res, err := svc.OperatorsByCountry("IN")
 	assert.Nil(t, err)
@@ -29,12 +28,11 @@ func TestGetOperatorsByCountry(t *testing.T) {
 	assert.Equal(t, "BSNL India", res[1].Name)
 }
 
-
 func TestSearchOperatorWhenFoundReturnsOperator(t *testing.T) {
 	dat, _ := ioutil.ReadFile("test/operators.json")
-    operators := string(dat)
+	operators := string(dat)
 
-	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request){
+	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/operators/countries/IN", r.URL.Path)
 
 		w.Header().Set("Content-Type", "application/com.reloadly.topups-v1+json")
@@ -42,7 +40,6 @@ func TestSearchOperatorWhenFoundReturnsOperator(t *testing.T) {
 	})
 
 	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
-
 
 	res, err := svc.SearchOperator("IN", "Reliance Jio India Bundles")
 	assert.Nil(t, err)
@@ -50,12 +47,11 @@ func TestSearchOperatorWhenFoundReturnsOperator(t *testing.T) {
 	assert.Equal(t, int64(186), res.OperatorID)
 }
 
-
 func TestSearchOperatorWhenNotFoundReturnsError(t *testing.T) {
 	dat, _ := ioutil.ReadFile("test/operators.json")
-    operators := string(dat)
+	operators := string(dat)
 
-	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request){
+	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/operators/countries/IN", r.URL.Path)
 
 		w.Header().Set("Content-Type", "application/com.reloadly.topups-v1+json")
@@ -63,7 +59,6 @@ func TestSearchOperatorWhenNotFoundReturnsError(t *testing.T) {
 	})
 
 	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
-
 
 	_, err := svc.SearchOperator("IN", "fooo")
 	assert.NotNil(t, err)

@@ -2,11 +2,10 @@ package reloadly
 
 import (
 	"encoding/json"
+	"strconv"
 	"strings"
 	"time"
-	"strconv"
 )
-
 
 type Timestamp time.Time
 
@@ -41,17 +40,15 @@ func (t *JSTimestamp) UnmarshalJSON(b []byte) error {
 
 // TODO: identityerrors return jstimestamp timestamp!!
 
-
 type APIError struct {
 	ErrorCode string `json:"errorCode,omitempty"`
-	Message string `json:"message,omitempty"`
+	Message   string `json:"message,omitempty"`
 	// TimeStamp *Timestamp `json:"timeStamp,omitempty"`
-	InfoLink string `json:"infoLink,omitempty"`
-	Path string `json:"path,omitempty"`
-	StatusCode int `json:"statusCode,omitempty"`
-	Details []map[string]string `json:"details,omitempty"`
+	InfoLink   string              `json:"infoLink,omitempty"`
+	Path       string              `json:"path,omitempty"`
+	StatusCode int                 `json:"statusCode,omitempty"`
+	Details    []map[string]string `json:"details,omitempty"`
 }
-
 
 func (e APIError) Empty() bool {
 	return e.ErrorCode == ""
@@ -64,16 +61,13 @@ func (e APIError) AsError() error {
 	return e
 }
 
-
-
 func (e APIError) Error() string {
 	return e.Message
 }
 
-
 type ReloadlyError struct {
 	ErrorCode string
-	Message string
+	Message   string
 }
 
 func (r ReloadlyError) Error() string {

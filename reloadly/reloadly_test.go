@@ -7,14 +7,13 @@ import (
 
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/dghubble/sling"
+	"github.com/stretchr/testify/assert"
 )
-
 
 func TestRequestGetNoQueryParams(t *testing.T) {
 
-	_, testSling := TestServer(func(w http.ResponseWriter, r *http.Request){
+	_, testSling := TestServer(func(w http.ResponseWriter, r *http.Request) {
 		vals := r.URL.RawQuery
 		assert.Equal(t, "", vals)
 
@@ -24,17 +23,16 @@ func TestRequestGetNoQueryParams(t *testing.T) {
 
 	svc := &Service{}
 
-	resp := new(struct{Bar string})
+	resp := new(struct{ Bar string })
 	_, err := svc.request(testSling, "GET", "/foo", new(struct{}), resp)
 
 	assert.Nil(t, err)
 	assert.Equal(t, "baz", resp.Bar)
 }
 
-
 func TestRequestGetReturnsErrors(t *testing.T) {
 
-	_, testSling := TestServer(func(w http.ResponseWriter, r *http.Request){
+	_, testSling := TestServer(func(w http.ResponseWriter, r *http.Request) {
 
 		w.WriteHeader(401)
 		w.Header().Set("Content-Type", "application/json")
@@ -43,7 +41,7 @@ func TestRequestGetReturnsErrors(t *testing.T) {
 
 	svc := &Service{}
 
-	resp := new(struct{Bar string})
+	resp := new(struct{ Bar string })
 	_, err := svc.request(testSling, "GET", "/foo", new(struct{}), resp)
 
 	assert.NotNil(t, err)
@@ -54,11 +52,10 @@ func TestRequestGetReturnsErrors(t *testing.T) {
 	assert.Equal(t, e.ErrorCode, "INVALID_CREDENTIALS")
 }
 
-
 func TestRequestGetReturnsErrorsOnHttpError(t *testing.T) {
 
 	svc := &Service{}
-	resp := new(struct{Bar string})
+	resp := new(struct{ Bar string })
 	_, err := svc.request(sling.New().Client(&http.Client{}).Base("http://foo"), "GET", "/foo", new(struct{}), resp)
 
 	assert.NotNil(t, err)

@@ -17,7 +17,7 @@ type Fx struct {
 }
 
 type SuggestedAmount struct {
-	Pay float64
+	Pay  float64
 	Sent float64
 }
 
@@ -44,51 +44,48 @@ func (s *SuggestedAmountsMap) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-
 type Operator struct {
-	OperatorID                int64       `json:"operatorId,omitempty"`
-	Name                      string      `json:"name,omitempty"`
-	Bundle                    bool        `json:"bundle,omitempty"`
-	Data                      bool        `json:"data,omitempty"`
-	Pin                       bool        `json:"pin,omitempty"`
-	SupportsLocalAmounts      bool        `json:"supportsLocalAmounts,omitempty"`
-	DenominationType          string      `json:"denominationType,omitempty"`
-	SenderCurrencyCode        string      `json:"senderCurrencyCode,omitempty"`
-	SenderCurrencySymbol      string      `json:"senderCurrencySymbol,omitempty"`
-	DestinationCurrencyCode   string      `json:"destinationCurrencyCode,omitempty"`
-	DestinationCurrencySymbol string      `json:"destinationCurrencySymbol,omitempty"`
-	Commission                float64     `json:"commission,omitempty"`
-	InternationalDiscount     float64     `json:"internationalDiscount,omitempty"`
-	LocalDiscount             float64     `json:"localDiscount,omitempty"`
-	MostPopularAmount         float64     `json:"mostPopularAmount,omitempty"`
-	MostPopularLocalAmount    float64     `json:"mostPopularLocalAmount,omitempty"`
-	MinAmount                 float64     `json:"minAmount,omitempty"`
-	MaxAmount                 float64     `json:"maxAmount,omitempty"`
-	LocalMinAmount            float64     `json:"localMinAmount,omitempty"`
-	LocalMaxAmount            float64     `json:"localMaxAmount,omitempty"`
-	Country                   Country     `json:"country,omitempty"`
-	Fx                        Fx          `json:"fx,omitempty"`
-	LogoUrls                  []string    `json:"logoUrls,omitempty"`
-	FixedAmounts              []float64   `json:"fixedAmounts,omitempty"`
+	OperatorID                int64     `json:"operatorId,omitempty"`
+	Name                      string    `json:"name,omitempty"`
+	Bundle                    bool      `json:"bundle,omitempty"`
+	Data                      bool      `json:"data,omitempty"`
+	Pin                       bool      `json:"pin,omitempty"`
+	SupportsLocalAmounts      bool      `json:"supportsLocalAmounts,omitempty"`
+	DenominationType          string    `json:"denominationType,omitempty"`
+	SenderCurrencyCode        string    `json:"senderCurrencyCode,omitempty"`
+	SenderCurrencySymbol      string    `json:"senderCurrencySymbol,omitempty"`
+	DestinationCurrencyCode   string    `json:"destinationCurrencyCode,omitempty"`
+	DestinationCurrencySymbol string    `json:"destinationCurrencySymbol,omitempty"`
+	Commission                float64   `json:"commission,omitempty"`
+	InternationalDiscount     float64   `json:"internationalDiscount,omitempty"`
+	LocalDiscount             float64   `json:"localDiscount,omitempty"`
+	MostPopularAmount         float64   `json:"mostPopularAmount,omitempty"`
+	MostPopularLocalAmount    float64   `json:"mostPopularLocalAmount,omitempty"`
+	MinAmount                 float64   `json:"minAmount,omitempty"`
+	MaxAmount                 float64   `json:"maxAmount,omitempty"`
+	LocalMinAmount            float64   `json:"localMinAmount,omitempty"`
+	LocalMaxAmount            float64   `json:"localMaxAmount,omitempty"`
+	Country                   Country   `json:"country,omitempty"`
+	Fx                        Fx        `json:"fx,omitempty"`
+	LogoUrls                  []string  `json:"logoUrls,omitempty"`
+	FixedAmounts              []float64 `json:"fixedAmounts,omitempty"`
 	// FixedAmountsDescriptions  {
 	// } `json:"fixedAmountsDescriptions,omitempty"`
-	LocalFixedAmounts         []float64 `json:"localFixedAmounts,omitempty"`
+	LocalFixedAmounts []float64 `json:"localFixedAmounts,omitempty"`
 	// LocalFixedAmountsDescriptions struct {
 	// } `json:"localFixedAmountsDescriptions,omitempty"`
-	SuggestedAmounts          []float64 `json:"suggestedAmounts,omitempty"`
-	SuggestedAmountsMap       SuggestedAmountsMap `json:"suggestedAmountsMap,omitempty"`
+	SuggestedAmounts    []float64           `json:"suggestedAmounts,omitempty"`
+	SuggestedAmountsMap SuggestedAmountsMap `json:"suggestedAmountsMap,omitempty"`
 	// Promotions []interface{} `json:"promotions,omitempty"`
 }
 
-
 type OperatorsParams struct {
-    SuggestedAmounts    bool `url:"suggestedAmounts,omitempty"`
-    SuggestedAmountsMap bool `url:"suggestedAmountsMap,omitempty"`
+	SuggestedAmounts    bool `url:"suggestedAmounts,omitempty"`
+	SuggestedAmountsMap bool `url:"suggestedAmountsMap,omitempty"`
 	IncludeBundles      bool `url:"includeBundles,omitempty"`
 	IncludeData         bool `url:"includeData,omitempty"`
 	IncludePin          bool `url:"includePin,omitempty"`
 }
-
 
 func (s *Service) OperatorsAutoDetect(mobile, country string) (*Operator, error) {
 	path := fmt.Sprintf("/operators/auto-detect/phone/%v/countries/%v", mobile, country)
@@ -99,11 +96,9 @@ func (s *Service) OperatorsAutoDetect(mobile, country string) (*Operator, error)
 	return resp, err
 }
 
-
 func (s *Service) OperatorsByCountry(country string) ([]Operator, error) {
 	path := fmt.Sprintf("/operators/countries/%v", country)
 	resp := new([]Operator)
-
 
 	params := &OperatorsParams{SuggestedAmountsMap: true}
 

@@ -85,7 +85,6 @@ to quickly create a Cobra application.`,
 
 		fmt.Printf("Topup response: %v", res)
 
-
 		return nil
 	},
 }

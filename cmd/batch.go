@@ -71,8 +71,6 @@ func BatchTopup(svc *reloadly.Service, numWorkers int, jobs []reloadly.TopupJob)
 	return res
 }
 
-
-
 // batchCmd represents the batch command
 var batchCmd = &cobra.Command{
 	Use:   "batch",

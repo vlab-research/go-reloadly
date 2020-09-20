@@ -18,7 +18,6 @@ func TestLoadBatchCsvLoadsFullCsv(t *testing.T) {
 	assert.Equal(t, "Foodafone India", deets[1].Operator)
 }
 
-
 func TestLoadBatchCsvLoadsCsvWithMissingToleranceOrOperators(t *testing.T) {
 	deets, err := LoadBatchCsv("test/batch-missing-rows.csv")
 	assert.Nil(t, err)
@@ -29,7 +28,6 @@ func TestLoadBatchCsvLoadsCsvWithMissingToleranceOrOperators(t *testing.T) {
 	assert.Equal(t, "Foodafone India", deets[1].Operator)
 }
 
-
 func TestLoadBatchCsvLoadsCsvWithMissingToleranceOrOperatorsInHeader(t *testing.T) {
 	deets, err := LoadBatchCsv("test/batch-missing-columns.csv")
 	assert.Nil(t, err)
@@ -39,7 +37,6 @@ func TestLoadBatchCsvLoadsCsvWithMissingToleranceOrOperatorsInHeader(t *testing.
 	assert.Equal(t, float64(100), deets[0].Amount)
 	assert.Equal(t, 2.5, deets[1].Amount)
 }
-
 
 func TestLoadBatchCsvErrorsWhenCsvMissingRequiredDetails(t *testing.T) {
 	_, err := LoadBatchCsv("test/batch-missing-required.csv")

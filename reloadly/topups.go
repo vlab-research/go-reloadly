@@ -8,7 +8,6 @@ import (
 	"time"
 )
 
-
 type TransactionDate time.Time
 
 func (t *TransactionDate) UnmarshalJSON(b []byte) error {
@@ -31,7 +30,6 @@ func (t *TransactionDate) MarshalJSON() ([]byte, error) {
 func (t *TransactionDate) MarshalCSV() ([]byte, error) {
 	return t.MarshalJSON()
 }
-
 
 type TopupResponse struct {
 	TransactionID               int64            `csv:"transactionId" json:"transactionId,omitempty"`
@@ -64,23 +62,22 @@ type SenderPhone struct {
 
 type TopupRequest struct {
 	RecipientPhone   *RecipientPhone `json:"recipientPhone,omitempty"`
-	SenderPhone      *SenderPhone `json:"senderPhone,omitempty"`
-	OperatorID       int64    `json:"operatorId,omitempty"`
-	Amount           float64    `json:"amount,omitempty"`
-	CustomIdentifier string `json:"customIdentifier,omitempty"`
+	SenderPhone      *SenderPhone    `json:"senderPhone,omitempty"`
+	OperatorID       int64           `json:"operatorId,omitempty"`
+	Amount           float64         `json:"amount,omitempty"`
+	CustomIdentifier string          `json:"customIdentifier,omitempty"`
 }
 
 type TopupsService struct {
 	*Service
-	autoDetect bool
+	autoDetect      bool
 	suggestedAmount bool
-	autoFallback bool
-	operator *Operator
-	country string
-	tolerance float64
-	error error
+	autoFallback    bool
+	operator        *Operator
+	country         string
+	tolerance       float64
+	error           error
 }
-
 
 func (s *Service) Topups() *TopupsService {
 	return &TopupsService{s, false, false, false, nil, "", 0.0, nil}
@@ -96,7 +93,6 @@ func (s *TopupsService) AutoDetect(country string) *TopupsService {
 	s.country = country
 	return s
 }
-
 
 func (s *TopupsService) GetSetOperator() *Operator {
 	return s.operator
@@ -126,10 +122,10 @@ func (s *TopupsService) AutoFallback() *TopupsService {
 }
 
 func pickAmount(amounts []SuggestedAmount, min float64, tolerance float64) (*SuggestedAmount, error) {
-	sort.Slice(amounts, func(i, j int) bool { return amounts[i].Sent < amounts[j].Sent})
+	sort.Slice(amounts, func(i, j int) bool { return amounts[i].Sent < amounts[j].Sent })
 
 	for _, a := range amounts {
-		if a.Sent >= min && a.Sent <= min + tolerance {
+		if a.Sent >= min && a.Sent <= min+tolerance {
 			return &a, nil
 		}
 	}
@@ -144,7 +140,7 @@ func getSuggestedAmount(operator *Operator, amount float64, tolerance float64) (
 	if err != nil {
 		err = ReloadlyError{
 			ErrorCode: "IMPOSSIBLE_AMOUNT",
-			Message: fmt.Sprintf("Could not manage to find an amount of at least %v for operator %v with suggested amounts %v", amount, operator.Name, amounts),
+			Message:   fmt.Sprintf("Could not manage to find an amount of at least %v for operator %v with suggested amounts %v", amount, operator.Name, amounts),
 		}
 		return 0, err
 	}
@@ -195,8 +191,8 @@ func (s *TopupsService) Topup(mobile string, amount float64) (*TopupResponse, er
 
 	req := &TopupRequest{
 		RecipientPhone: &RecipientPhone{s.operator.Country.IsoName, mobile},
-		OperatorID: s.operator.OperatorID,
-		Amount: amt,
+		OperatorID:     s.operator.OperatorID,
+		Amount:         amt,
 	}
 
 	resp := new(TopupResponse)

@@ -3,18 +3,18 @@ package reloadly
 type TopupWorker Service
 
 type TopupJob struct {
-	Number string `csv:"number" json:"number"`
-	Amount float64 `csv:"amount" json:"amount"`
-	Country string `csv:"country" json:"country"`
+	Number    string  `csv:"number" json:"number"`
+	Amount    float64 `csv:"amount" json:"amount"`
+	Country   string  `csv:"country" json:"country"`
 	Tolerance float64 `csv:"tolerance,omitempty" json:"tolerance,omitempty"`
-	Operator string `csv:"operator,omitempty" json:"operator,omitempty"`
-	ID string `csv:"id,omitempty" json:"id,omitempty"`
+	Operator  string  `csv:"operator,omitempty" json:"operator,omitempty"`
+	ID        string  `csv:"id,omitempty" json:"id,omitempty"`
 }
 
 type TopupWorkerResponse struct {
 	*TopupResponse
 	ErrorMessage string `csv:"errrorMessage" json:"errorMessage,omitempty"`
-	ErrorCode string `csv:"errorCode" json:"errorCode,omitempty"`
+	ErrorCode    string `csv:"errorCode" json:"errorCode,omitempty"`
 }
 
 func (r *TopupWorkerResponse) SetError(err error) *TopupWorkerResponse {
@@ -32,15 +32,14 @@ func (r *TopupWorkerResponse) SetError(err error) *TopupWorkerResponse {
 func workErrorResponse(err error, d *TopupJob) *TopupWorkerResponse {
 	tr := &TopupResponse{}
 	tr.OperatorName = d.Operator
-	tr.RecipientPhone =  d.Number
+	tr.RecipientPhone = d.Number
 	tr.CountryCode = d.Country
 	tr.RequestedAmount = d.Amount
 
-    r := &TopupWorkerResponse{tr, "", ""}
+	r := &TopupWorkerResponse{tr, "", ""}
 	r.SetError(err)
 	return r
 }
-
 
 func (t *TopupWorker) DoJob(d *TopupJob) (*TopupResponse, error) {
 	svc := Service(*t)

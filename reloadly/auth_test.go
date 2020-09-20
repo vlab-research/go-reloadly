@@ -10,9 +10,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-
 func TestGetAuthTokenMakesAudience(t *testing.T) {
-	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request){
+	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request) {
 
 		expected := `{"client_id":"id","client_secret":"secret","audience":"reloadly.com","grant_type":"client_credentials"}`
 
@@ -28,7 +27,6 @@ func TestGetAuthTokenMakesAudience(t *testing.T) {
 		fmt.Fprintf(w, `{"token_type": "Bearer", "access_token": "foobarbaz", "expires_in": 86400, "scope": "foo bar baz"}`)
 	})
 
-
 	svc := &Service{AuthUrl: ts.URL, BaseUrl: "reloadly.com", Client: &http.Client{}}
 
 	err := svc.Auth("id", "secret")
@@ -36,10 +34,9 @@ func TestGetAuthTokenMakesAudience(t *testing.T) {
 	assert.Equal(t, "foobarbaz", svc.Token.AccessToken)
 }
 
-
 func TestGetAuthTokenReturnsErrors(t *testing.T) {
 
-	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request){
+	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request) {
 
 		w.WriteHeader(401)
 		w.Header().Set("Content-Type", "application/json")

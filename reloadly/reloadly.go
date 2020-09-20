@@ -9,10 +9,10 @@ import (
 )
 
 type Service struct {
-	Client *http.Client
+	Client  *http.Client
 	BaseUrl string
 	AuthUrl string
-	Token *Token
+	Token   *Token
 }
 
 func New() *Service {
@@ -54,8 +54,8 @@ func (s *Service) request(sli *sling.Sling, method, path string, params interfac
 	// own "APIError" from the status.
 	if status < 200 || status > 299 {
 		return httpResponse, APIError{
-			Message: httpResponse.Status,
-			ErrorCode: fmt.Sprint(status),
+			Message:    httpResponse.Status,
+			ErrorCode:  fmt.Sprint(status),
 			StatusCode: status,
 		}
 	}

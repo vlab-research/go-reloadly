@@ -17,11 +17,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-
 func getOperators() []Operator {
 	dat, _ := ioutil.ReadFile("test/operators.json")
 	var ops []Operator
-    json.Unmarshal(dat, &ops)
+	json.Unmarshal(dat, &ops)
 
 	return ops
 }
@@ -33,7 +32,7 @@ func TestPickAmountGetsEnough(t *testing.T) {
 		amt, err := pickAmount(op.SuggestedAmountsMap, 100, 50)
 
 		if err != nil {
-			assert.Equal(t, i , 3)
+			assert.Equal(t, i, 3)
 			continue
 		}
 
@@ -49,10 +48,9 @@ func TestTopupReturnsErrorWithoutOperator(t *testing.T) {
 	assert.Equal(t, "INVALID_CALL", err.(ReloadlyError).ErrorCode)
 }
 
-
 func TestTopupReturnsErrorIfFindOperatorFails(t *testing.T) {
 
-	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request){
+	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request) {
 
 		assert.Equal(t, "/operators/countries/IN", r.URL.Path)
 
@@ -69,22 +67,21 @@ func TestTopupReturnsErrorIfFindOperatorFails(t *testing.T) {
 	assert.Equal(t, "OPERATOR_NOT_FOUND", err.(APIError).ErrorCode)
 }
 
-
 func TestTopupCallsWithOperatorIfFindOperatorSucceeds(t *testing.T) {
 	dat, _ := ioutil.ReadFile("test/operators.json")
-    operators := string(dat)
+	operators := string(dat)
 
 	done := make(chan bool)
 
 	ts, mux := TestServerMux()
 
-	mux.HandleFunc("/operators/countries/IN", func(w http.ResponseWriter, r *http.Request){
+	mux.HandleFunc("/operators/countries/IN", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintf(w, operators)
 	})
 
-	mux.HandleFunc("/topups", func(w http.ResponseWriter, r *http.Request){
+	mux.HandleFunc("/topups", func(w http.ResponseWriter, r *http.Request) {
 		expected := `{"recipientPhone":{"countryCode":"IN","number":"+123"},"operatorId":200,"amount":100}`
 
 		data, _ := ioutil.ReadAll(r.Body)
@@ -101,12 +98,12 @@ func TestTopupCallsWithOperatorIfFindOperatorSucceeds(t *testing.T) {
 	_, err := svc.Topups().FindOperator("IN", "Airtel India").Topup("+123", 100)
 	assert.Nil(t, err)
 
-	<- done
+	<-done
 }
 
 func TestTopupReturnsErrorIfAutoDetectFails(t *testing.T) {
 
-	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request){
+	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/operators/auto-detect/phone/+123/countries/IN", r.URL.Path)
 
 		w.WriteHeader(404)
@@ -121,23 +118,22 @@ func TestTopupReturnsErrorIfAutoDetectFails(t *testing.T) {
 	assert.Equal(t, "COULD_NOT_AUTO_DETECT_OPERATOR", err.(APIError).ErrorCode)
 }
 
-
 func TestTopupCallsWithOperatorIfAutoDetectSucceeds(t *testing.T) {
 	dat, _ := ioutil.ReadFile("test/airtel.json")
-    airtel := string(dat)
+	airtel := string(dat)
 
 	done := make(chan bool)
 
 	ts, mux := TestServerMux()
 
-	mux.HandleFunc( "/operators/auto-detect/phone/+123/countries/IN", func(w http.ResponseWriter, r *http.Request){
+	mux.HandleFunc("/operators/auto-detect/phone/+123/countries/IN", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json")
 
 		fmt.Fprint(w, airtel)
 	})
 
-	mux.HandleFunc("/topups", func(w http.ResponseWriter, r *http.Request){
+	mux.HandleFunc("/topups", func(w http.ResponseWriter, r *http.Request) {
 		expected := `{"recipientPhone":{"countryCode":"IN","number":"+123"},"operatorId":200,"amount":100}`
 
 		data, _ := ioutil.ReadAll(r.Body)
@@ -156,7 +152,7 @@ func TestTopupCallsWithOperatorIfAutoDetectSucceeds(t *testing.T) {
 }
 
 func TestTopupBySuggestedAmountReturnsErrorOnEmptyAmounts(t *testing.T) {
-	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request){})
+	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request) {})
 
 	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
 	op := Operator{Name: "Foodafone"}
@@ -169,7 +165,7 @@ func TestTopupBySuggestedAmountReturnsErrorOnEmptyAmounts(t *testing.T) {
 
 func TestTopupBySuggestedAmountSendsRequestForGoodAmount(t *testing.T) {
 
-	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request){
+	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request) {
 
 		expected := `{"recipientPhone":{"countryCode":"IN","number":"+123"},"operatorId":211,"amount":1.82}`
 
@@ -189,17 +185,15 @@ func TestTopupBySuggestedAmountSendsRequestForGoodAmount(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-
-
 func TestTopupWithAutoFallbackReCallsWithNewOperatorId(t *testing.T) {
 	dat, _ := ioutil.ReadFile("test/airtel.json")
-    airtel := string(dat)
+	airtel := string(dat)
 
 	done := make(chan bool)
 
 	ts, mux := TestServerMux()
 
-	mux.HandleFunc( "/operators/auto-detect/phone/+123/countries/IN", func(w http.ResponseWriter, r *http.Request){
+	mux.HandleFunc("/operators/auto-detect/phone/+123/countries/IN", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json")
 
@@ -207,7 +201,7 @@ func TestTopupWithAutoFallbackReCallsWithNewOperatorId(t *testing.T) {
 	})
 
 	count := 0
-	mux.HandleFunc("/topups", func(w http.ResponseWriter, r *http.Request){
+	mux.HandleFunc("/topups", func(w http.ResponseWriter, r *http.Request) {
 
 		if count == 0 {
 			expected := `{"recipientPhone":{"countryCode":"IN","number":"+123"},"operatorId":1,"amount":100}`
