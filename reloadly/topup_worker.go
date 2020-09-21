@@ -1,6 +1,46 @@
 package reloadly
 
+import (
+	"fmt"
+	"github.com/vlab-research/gotils"
+)
+
 type TopupWorker Service
+
+func GimmeString(i interface{}) (interface{}, error) {
+	switch i.(type) {
+
+	case nil:
+		return nil, nil
+
+	case float64:
+
+		// Default type for json numbers.
+		// Check if can be integer
+		f := i.(float64)
+		if float64(int64(f)) == f {
+			return fmt.Sprint(int64(f)), nil
+		}
+		return fmt.Sprint(f), nil
+
+	default:
+		return fmt.Sprint(i), nil
+	}
+}
+
+func (j *TopupJob) UnmarshalJSON(b []byte) error {
+	castFns := gotils.CastMap{
+		"Number": GimmeString,
+		"ID":     GimmeString,
+	}
+	obj, err := gotils.MarshalWithCasts(b, TopupJob{}, castFns)
+	if err != nil {
+		return err
+	}
+
+	*j = obj.(TopupJob)
+	return nil
+}
 
 type TopupJob struct {
 	Number    string  `csv:"number" json:"number" validate:"required"`

@@ -90,7 +90,7 @@ type OperatorsParams struct {
 func (s *Service) OperatorsAutoDetect(mobile, country string) (*Operator, error) {
 	path := fmt.Sprintf("/operators/auto-detect/phone/%v/countries/%v", mobile, country)
 
-	params := &OperatorsParams{SuggestedAmountsMap: true}
+	params := &OperatorsParams{SuggestedAmountsMap: true, SuggestedAmounts: true}
 	resp := new(Operator)
 	_, err := s.Request("GET", path, params, resp)
 	return resp, err
@@ -100,7 +100,7 @@ func (s *Service) OperatorsByCountry(country string) ([]Operator, error) {
 	path := fmt.Sprintf("/operators/countries/%v", country)
 	resp := new([]Operator)
 
-	params := &OperatorsParams{SuggestedAmountsMap: true}
+	params := &OperatorsParams{SuggestedAmountsMap: true, SuggestedAmounts: true}
 
 	_, err := s.Request("GET", path, params, resp)
 	return *resp, err
