@@ -2,7 +2,6 @@ package reloadly
 
 import (
 	"fmt"
-
 	"net/http"
 
 	"testing"
@@ -60,9 +59,54 @@ func TestRequestGetReturnsErrorsOnHttpError(t *testing.T) {
 
 	assert.NotNil(t, err)
 	_, ok := err.(APIError)
-
 	assert.False(t, ok)
-	t.Log(err)
-	// assert.NotNil(t, e)
-	// assert.Equal(t, e.ErrorCode, "INVALID_CREDENTIALS")
+}
+
+func TestRequestDoesReAuthOnErrorCodeTOKEN_EXPIRED(t *testing.T) {
+	done := make(chan bool)
+	ts, mux := TestServerMux()
+
+	authCount := 0
+	mux.HandleFunc("/oauth/token", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		w.Header().Set("Content-Type", "application/json")
+		if authCount == 0 {
+			fmt.Fprintf(w, `{"token_type": "Bearer", "access_token": "foobar", "expires_in": 86400, "scope": "foo bar baz"}`)
+		}
+		if authCount == 1 {
+			fmt.Fprintf(w, `{"token_type": "Bearer", "access_token": "foobarbaz", "expires_in": 86400, "scope": "foo bar baz"}`)
+		}
+		authCount++
+	})
+
+	count := 0
+	mux.HandleFunc("/foo", func(w http.ResponseWriter, r *http.Request) {
+		if count == 0 {
+			assert.Equal(t, "Bearer foobar", r.Header.Get("Authorization"))
+			w.WriteHeader(401)
+			w.Header().Set("Content-Type", "application/json")
+			fmt.Fprintf(w, `{"errorCode":"TOKEN_EXPIRED"}`)
+		}
+
+		if count == 1 {
+			assert.Equal(t, "Bearer foobarbaz", r.Header.Get("Authorization"))
+			w.WriteHeader(200)
+			w.Header().Set("Content-Type", "application/json")
+			fmt.Fprintf(w, `{"Bar": "qux"}`)
+			close(done)
+		}
+		count++
+	})
+	svc := &Service{BaseUrl: ts.URL, AuthUrl: ts.URL, Client: &http.Client{}}
+	resp := new(struct{ Bar string })
+
+	err := svc.Auth("id", "secret")
+	assert.Nil(t, err)
+
+	_, err = svc.Request("GET", "/foo", new(struct{}), resp)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 2, authCount)
+	assert.Equal(t, 2, count)
+	<-done
 }

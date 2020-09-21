@@ -13,6 +13,8 @@ type Service struct {
 	BaseUrl string
 	AuthUrl string
 	Token   *Token
+	id      string
+	secret  string
 }
 
 func New() *Service {
@@ -21,6 +23,8 @@ func New() *Service {
 		"https://topups.reloadly.com",
 		"https://auth.reloadly.com",
 		nil,
+		"",
+		"",
 	}
 }
 
@@ -49,9 +53,10 @@ func (s *Service) request(sli *sling.Sling, method, path string, params interfac
 		return httpResponse, apiError
 	}
 
-	// Reloadly will send an erro response without
+	// Reloadly will send an error response without
 	// a body, sometimes, so we just create our
 	// own "APIError" from the status.
+	// TODO: remember when they do this...
 	if status < 200 || status > 299 {
 		return httpResponse, APIError{
 			Message:    httpResponse.Status,
@@ -64,11 +69,29 @@ func (s *Service) request(sli *sling.Sling, method, path string, params interfac
 
 func (s *Service) Request(method, path string, params interface{}, resp interface{}) (*http.Response, error) {
 
-	sli := sling.New().Client(s.Client).Base(s.BaseUrl).Set("Accept", "application/com.reloadly.topups-v1+json")
+	op := func() (*http.Response, error) {
+		sli := sling.New().Client(s.Client).Base(s.BaseUrl).Set("Accept", "application/com.reloadly.topups-v1+json")
 
-	if s.Token != nil {
-		auth := fmt.Sprintf("%v %v", s.Token.TokenType, s.Token.AccessToken)
-		sli = sli.Set("Authorization", auth)
+		if s.Token != nil {
+			auth := fmt.Sprintf("%v %v", s.Token.TokenType, s.Token.AccessToken)
+			sli = sli.Set("Authorization", auth)
+		}
+
+		return s.request(sli, method, path, params, resp)
 	}
-	return s.request(sli, method, path, params, resp)
+
+	httpResponse, err := op()
+
+	// If expired, try redoing the operation one time
+	if err != nil {
+		if e, ok := err.(APIError); ok && e.ErrorCode == "TOKEN_EXPIRED" {
+			err = s.ReAuth()
+			if err != nil {
+				return nil, err
+			}
+			return op()
+		}
+	}
+
+	return httpResponse, err
 }

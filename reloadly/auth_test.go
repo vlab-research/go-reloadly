@@ -34,6 +34,42 @@ func TestGetAuthTokenMakesAudience(t *testing.T) {
 	assert.Equal(t, "foobarbaz", svc.Token.AccessToken)
 }
 
+func TestReAuthReUsesIdAndSecretAndSetsNewToken(t *testing.T) {
+	count := 0
+	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request) {
+		data, err := ioutil.ReadAll(r.Body)
+		dat := strings.TrimSpace(string(data))
+		assert.Nil(t, err)
+		assert.Equal(t, "/oauth/token", r.URL.Path)
+
+		w.WriteHeader(200)
+		w.Header().Set("Content-Type", "application/json")
+
+		if count == 0 {
+			expected := `{"client_id":"id","client_secret":"secret","audience":"reloadly.com","grant_type":"client_credentials"}`
+			assert.Equal(t, expected, dat)
+			fmt.Fprintf(w, `{"token_type": "Bearer", "access_token": "foobarbaz", "expires_in": 86400, "scope": "foo bar baz"}`)
+		}
+
+		if count == 1 {
+			expected := `{"client_id":"id","client_secret":"secret","audience":"reloadly.com","grant_type":"client_credentials"}`
+			assert.Equal(t, expected, dat)
+			fmt.Fprintf(w, `{"token_type": "Bearer", "access_token": "foobarbazqux", "expires_in": 86400, "scope": "foo bar baz"}`)
+		}
+		count++
+	})
+
+	svc := &Service{AuthUrl: ts.URL, BaseUrl: "reloadly.com", Client: &http.Client{}}
+
+	err := svc.Auth("id", "secret")
+	assert.Nil(t, err)
+	assert.Equal(t, "foobarbaz", svc.Token.AccessToken)
+
+	err = svc.ReAuth()
+	assert.Nil(t, err)
+	assert.Equal(t, "foobarbazqux", svc.Token.AccessToken)
+}
+
 func TestGetAuthTokenReturnsErrors(t *testing.T) {
 
 	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request) {

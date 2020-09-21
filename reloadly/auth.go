@@ -1,6 +1,10 @@
 package reloadly
 
-import "github.com/dghubble/sling"
+import (
+	"fmt"
+
+	"github.com/dghubble/sling"
+)
 
 type OAuthRequest struct {
 	ID        string `json:"client_id,omitempty"`
@@ -26,11 +30,20 @@ func (s *Service) GetOAuthToken(clientId, clientSecret string) (*Token, error) {
 	return token, err
 }
 
+func (s *Service) ReAuth() error {
+	if s.id == "" || s.secret == "" {
+		return fmt.Errorf("ReAuth failed as the Service has no stored id and secret")
+	}
+	return s.Auth(s.id, s.secret)
+}
+
 func (s *Service) Auth(clientId, clientSecret string) error {
 	res, err := s.GetOAuthToken(clientId, clientSecret)
 	if err != nil {
 		return err
 	}
 	s.Token = res
+	s.id = clientId
+	s.secret = clientSecret
 	return nil
 }
