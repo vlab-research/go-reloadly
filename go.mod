@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/dghubble/sling v1.3.0
+	github.com/go-playground/validator/v10 v10.3.0
 	github.com/jszwec/csvutil v1.4.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/nandanrao/chance v0.0.2

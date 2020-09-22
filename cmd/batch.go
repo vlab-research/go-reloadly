@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/jszwec/csvutil"
 	"github.com/nandanrao/chance"
 	"github.com/nandanrao/go-reloadly/reloadly"
@@ -37,6 +38,14 @@ func LoadBatchCsv(path string) ([]reloadly.TopupJob, error) {
 
 	if len(jobs) == 0 {
 		return jobs, fmt.Errorf("We could not parse the data from the csv. Please ensure it is in the right format and that the required fields (number, amount, country) are present for each row in the csv file.")
+	}
+
+	validate := validator.New()
+	for _, job := range jobs {
+		err = validate.Struct(job)
+		if err != nil {
+			return jobs, err
+		}
 	}
 
 	return jobs, nil
