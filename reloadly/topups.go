@@ -121,6 +121,11 @@ func (s *TopupsService) AutoFallback() *TopupsService {
 	return s
 }
 
+func NormalizeNumber(number string) (string, error) {
+	// normalize
+	return number, nil
+}
+
 func pickAmount(amounts []SuggestedAmount, min float64, tolerance float64) (*SuggestedAmount, error) {
 	sort.Slice(amounts, func(i, j int) bool { return amounts[i].Sent < amounts[j].Sent })
 
@@ -133,7 +138,7 @@ func pickAmount(amounts []SuggestedAmount, min float64, tolerance float64) (*Sug
 	return nil, errors.New("no amount found")
 }
 
-func getSuggestedAmount(operator *Operator, amount float64, tolerance float64) (float64, error) {
+func GetSuggestedAmount(operator *Operator, amount float64, tolerance float64) (float64, error) {
 	amounts := operator.SuggestedAmountsMap
 	amt, err := pickAmount(amounts, amount, tolerance)
 
@@ -152,7 +157,10 @@ func tryAutoFallback(err error) bool {
 	if e, ok := err.(APIError); ok {
 		switch e.ErrorCode {
 
-		case "TRANSACTION_REFUSED_BY_OPERATOR", "INVALID_RECIPIENT_PHONE":
+		case "TRANSACTION_REFUSED_BY_OPERATOR",
+			"INVALID_RECIPIENT_PHONE",
+			"INVALID_AMOUNT_FOR_OPERATOR":
+
 			return true
 
 		default:
@@ -182,7 +190,7 @@ func (s *TopupsService) Topup(mobile string, amount float64) (*TopupResponse, er
 	}
 
 	if s.suggestedAmount {
-		a, err := getSuggestedAmount(s.operator, amount, s.tolerance)
+		a, err := GetSuggestedAmount(s.operator, amount, s.tolerance)
 		if err != nil {
 			return nil, err
 		}
