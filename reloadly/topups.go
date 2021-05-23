@@ -3,6 +3,7 @@ package reloadly
 import (
 	"errors"
 	"fmt"
+	"math"
 	"sort"
 	"strings"
 	"time"
@@ -126,6 +127,22 @@ func NormalizeNumber(number string) (string, error) {
 	return number, nil
 }
 
+func checkRangeAmount(operator *Operator, amount float64) (float64, error) {
+	min := operator.LocalMinAmount
+	max := operator.LocalMaxAmount
+
+	if amount >= min && amount <= max {
+		upper_lim := amount / operator.Fx.Rate
+		upper_lim = math.Ceil(upper_lim*100) / 100
+		return upper_lim, nil
+	}
+
+	return 0, ReloadlyError{
+		ErrorCode: "IMPOSSIBLE_AMOUNT",
+		Message:   fmt.Sprintf("Operator %v has a minimum amount of %v and max of %v. Amount %v requested could not be fulfilled", operator.Name, min, max, amount),
+	}
+}
+
 func pickAmount(amounts []SuggestedAmount, min float64, tolerance float64) (*SuggestedAmount, error) {
 	sort.Slice(amounts, func(i, j int) bool { return amounts[i].Sent < amounts[j].Sent })
 
@@ -139,6 +156,10 @@ func pickAmount(amounts []SuggestedAmount, min float64, tolerance float64) (*Sug
 }
 
 func GetSuggestedAmount(operator *Operator, amount float64, tolerance float64) (float64, error) {
+	if operator.DenominationType == "RANGE" {
+		return checkRangeAmount(operator, amount)
+	}
+
 	amounts := operator.SuggestedAmountsMap
 	amt, err := pickAmount(amounts, amount, tolerance)
 
@@ -152,6 +173,14 @@ func GetSuggestedAmount(operator *Operator, amount float64, tolerance float64) (
 
 	return amt.Pay, nil
 }
+
+// create retry timeout function
+// retries every Xmin for Y mins
+// for a set of ErrorCodes:
+// PHONE_RECENTLY_RECHARGED
+// TRANSACTION_CANNOT_BE_PROCESSED_AT_THE_MOMENT
+// PROVIDER_INTERNAL_ERROR
+// SERVICE_TO_OPERATOR_TEMPORARILY_UNAVAILABLE
 
 func tryAutoFallback(err error) bool {
 	if e, ok := err.(APIError); ok {
@@ -170,8 +199,8 @@ func tryAutoFallback(err error) bool {
 	return false
 }
 
-func (s *TopupsService) Topup(mobile string, amount float64) (*TopupResponse, error) {
-	amt := amount
+func (s *TopupsService) Topup(mobile string, requested_amount float64) (*TopupResponse, error) {
+	amount := requested_amount
 
 	if s.error != nil {
 		return nil, s.error
@@ -189,29 +218,31 @@ func (s *TopupsService) Topup(mobile string, amount float64) (*TopupResponse, er
 		return nil, ReloadlyError{"INVALID_CALL", "You must set an operator to call Topup"}
 	}
 
+	// TODO: this is poor naming given current behavior.
+	// It's confusing the way tolerance is overloaded.
+	// needs some rethinking.
 	if s.suggestedAmount {
-		a, err := GetSuggestedAmount(s.operator, amount, s.tolerance)
+		a, err := GetSuggestedAmount(s.operator, requested_amount, s.tolerance)
 		if err != nil {
 			return nil, err
 		}
-		amt = a
+		amount = a
 	}
 
 	req := &TopupRequest{
 		RecipientPhone: &RecipientPhone{s.operator.Country.IsoName, mobile},
 		OperatorID:     s.operator.OperatorID,
-		Amount:         amt,
+		Amount:         amount,
 	}
 
 	resp := new(TopupResponse)
 	_, err := s.Request("POST", "/topups", req, resp)
 
 	// add retries??
-
 	if err == nil || s.autoFallback == false || !tryAutoFallback(err) {
 		return resp, err
 	}
 
 	// try with auto detect!
-	return s.AutoDetect(s.operator.Country.IsoName).Topup(mobile, amount)
+	return s.AutoDetect(s.operator.Country.IsoName).Topup(mobile, requested_amount)
 }

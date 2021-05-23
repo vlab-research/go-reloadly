@@ -155,12 +155,43 @@ func TestTopupBySuggestedAmountReturnsErrorOnEmptyAmounts(t *testing.T) {
 	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request) {})
 
 	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
-	op := Operator{Name: "Foodafone"}
+	op := Operator{Name: "Foodafone", DenominationType: "FIXED"}
 	_, err := svc.Topups().SuggestedAmount(50).Operator(&op).Topup("+123", 100)
 
 	assert.NotNil(t, err)
 	assert.Equal(t, "IMPOSSIBLE_AMOUNT", err.(ReloadlyError).ErrorCode)
 	assert.Contains(t, err.(ReloadlyError).Message, "Foodafone")
+}
+
+func TestTopupBySuggestedAmountReturnsErrorOnAmountOutOfRange(t *testing.T) {
+
+	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request) {
+
+		expected := `{"recipientPhone":{"countryCode":"IN","number":"+123"},"operatorId":211,"amount":1.82}`
+
+		data, _ := ioutil.ReadAll(r.Body)
+		dat := strings.TrimSpace(string(data))
+		assert.Equal(t, expected, dat)
+
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintf(w, `{"hey": "yeah"}`)
+	})
+
+	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
+
+	op := Operator{
+		Name:             "Foodafone",
+		DenominationType: "RANGE",
+		LocalMinAmount:   0,
+		LocalMaxAmount:   50,
+	}
+
+	_, err := svc.Topups().SuggestedAmount(50).Operator(&op).Topup("+123", 100)
+
+	assert.NotNil(t, err)
+	assert.Equal(t, "IMPOSSIBLE_AMOUNT", err.(ReloadlyError).ErrorCode)
+	assert.Contains(t, err.(ReloadlyError).Message, "Foodafone")
+	assert.Contains(t, err.(ReloadlyError).Message, "50")
 }
 
 func TestTopupBySuggestedAmountSendsRequestForGoodAmount(t *testing.T) {
@@ -181,6 +212,37 @@ func TestTopupBySuggestedAmountSendsRequestForGoodAmount(t *testing.T) {
 
 	op := getOperators()[5]
 	_, err := svc.Topups().SuggestedAmount(50).Operator(&op).Topup("+123", 100)
+
+	assert.Nil(t, err)
+}
+
+func TestTopupBySuggestedAmountSendsAmountIfInRange(t *testing.T) {
+
+	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request) {
+
+		expected := `{"recipientPhone":{"countryCode":"IN","number":"+123"},"operatorId":211,"amount":0.48}`
+
+		data, _ := ioutil.ReadAll(r.Body)
+		dat := strings.TrimSpace(string(data))
+		assert.Equal(t, expected, dat)
+
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintf(w, `{"hey": "yeah"}`)
+	})
+
+	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
+
+	op := Operator{
+		OperatorID:       211,
+		Name:             "Foodafone",
+		DenominationType: "RANGE",
+		Country:          Country{"IN", "India"},
+		Fx:               Fx{52.63, "INR"},
+		LocalMinAmount:   0,
+		LocalMaxAmount:   50,
+	}
+
+	_, err := svc.Topups().SuggestedAmount(5).Operator(&op).Topup("+123", 25)
 
 	assert.Nil(t, err)
 }
