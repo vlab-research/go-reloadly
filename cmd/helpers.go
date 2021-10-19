@@ -3,7 +3,7 @@ package cmd
 import (
 	"os"
 
-	"github.com/nandanrao/go-reloadly/reloadly"
+	"github.com/vlab-research/go-reloadly/reloadly"
 	"github.com/spf13/cobra"
 )
 

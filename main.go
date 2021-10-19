@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "github.com/nandanrao/go-reloadly/cmd"
+import "github.com/vlab-research/go-reloadly/cmd"
 
 func main() {
 	cmd.Execute()

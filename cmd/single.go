@@ -19,10 +19,10 @@ import (
 	"errors"
 	"fmt"
 
-	// "github.com/nandanrao/go-reloadly/reloadly"
+	// "github.com/vlab-research/go-reloadly/reloadly"
 	"strconv"
 
-	"github.com/nandanrao/go-reloadly/reloadly"
+	"github.com/vlab-research/go-reloadly/reloadly"
 	"github.com/spf13/cobra"
 )
 

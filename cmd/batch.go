@@ -23,7 +23,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/jszwec/csvutil"
 	"github.com/nandanrao/chance"
-	"github.com/nandanrao/go-reloadly/reloadly"
+	"github.com/vlab-research/go-reloadly/reloadly"
 	"github.com/spf13/cobra"
 )
 

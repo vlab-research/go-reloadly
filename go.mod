@@ -1,4 +1,4 @@
-module github.com/nandanrao/go-reloadly
+module github.com/vlab-research/go-reloadly
 
 go 1.15
 
