@@ -2,6 +2,7 @@ package reloadly
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -62,7 +63,7 @@ func (e APIError) AsError() error {
 }
 
 func (e APIError) Error() string {
-	return e.Message
+	return fmt.Sprintf("%v: %v", e.ErrorCode, e.Message)
 }
 
 type ReloadlyError struct {
@@ -70,6 +71,6 @@ type ReloadlyError struct {
 	Message   string
 }
 
-func (r ReloadlyError) Error() string {
-	return r.Message
+func (e ReloadlyError) Error() string {
+	return fmt.Sprintf("%v: %v", e.ErrorCode, e.Message)
 }
