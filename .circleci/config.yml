@@ -1,0 +1,16 @@
+version: 2
+
+jobs:
+  test:
+    machine:
+      image: ubuntu-1604:202007-01
+    steps:
+      - checkout
+      - run:
+          command: ./test.sh --is-ci
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test
