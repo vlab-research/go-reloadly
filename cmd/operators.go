@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/vlab-research/go-reloadly/reloadly"
 	"github.com/spf13/cobra"
+	"github.com/vlab-research/go-reloadly/reloadly"
 )
 
 // operatorsCmd represents the operators command

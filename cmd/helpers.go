@@ -3,8 +3,8 @@ package cmd
 import (
 	"os"
 
-	"github.com/vlab-research/go-reloadly/reloadly"
 	"github.com/spf13/cobra"
+	"github.com/vlab-research/go-reloadly/reloadly"
 )
 
 func LoadService(cmd *cobra.Command) (*reloadly.Service, error) {

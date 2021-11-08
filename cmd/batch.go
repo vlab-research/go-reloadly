@@ -8,8 +8,8 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/jszwec/csvutil"
 	"github.com/nandanrao/chance"
-	"github.com/vlab-research/go-reloadly/reloadly"
 	"github.com/spf13/cobra"
+	"github.com/vlab-research/go-reloadly/reloadly"
 )
 
 func LoadBatchCsv(path string) ([]reloadly.TopupJob, error) {
