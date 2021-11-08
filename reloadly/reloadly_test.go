@@ -21,7 +21,6 @@ func TestRequestGetNoQueryParams(t *testing.T) {
 	})
 
 	svc := &Service{}
-
 	resp := new(struct{ Bar string })
 	_, err := svc.request(testSling, "GET", "/foo", new(struct{}), resp)
 
@@ -39,7 +38,6 @@ func TestRequestGetReturnsErrors(t *testing.T) {
 	})
 
 	svc := &Service{}
-
 	resp := new(struct{ Bar string })
 	_, err := svc.request(testSling, "GET", "/foo", new(struct{}), resp)
 
@@ -87,7 +85,6 @@ func TestRequestDoesReAuthOnErrorCodeTOKEN_EXPIRED(t *testing.T) {
 			w.Header().Set("Content-Type", "application/json")
 			fmt.Fprintf(w, `{"errorCode":"TOKEN_EXPIRED"}`)
 		}
-
 		if count == 1 {
 			assert.Equal(t, "Bearer foobarbaz", r.Header.Get("Authorization"))
 			w.WriteHeader(200)

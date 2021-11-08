@@ -6,13 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
-
-	// "strings"
 	"testing"
-
-	// "io/ioutil"
-	//	"net/http"
-	// "fmt"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -26,11 +20,9 @@ func getOperators() []Operator {
 }
 
 func TestPickAmountGetsEnough(t *testing.T) {
-	ops := getOperators()
 
-	for i, op := range ops {
+	for i, op := range getOperators() {
 		amt, err := pickAmount(op.SuggestedAmountsMap, 100, 50)
-
 		if err != nil {
 			assert.Equal(t, i, 3)
 			continue
@@ -70,9 +62,7 @@ func TestTopupReturnsErrorIfFindOperatorFails(t *testing.T) {
 func TestTopupCallsWithOperatorIfFindOperatorSucceeds(t *testing.T) {
 	dat, _ := ioutil.ReadFile("test/operators.json")
 	operators := string(dat)
-
 	done := make(chan bool)
-
 	ts, mux := TestServerMux()
 
 	mux.HandleFunc("/operators/countries/IN", func(w http.ResponseWriter, r *http.Request) {
@@ -121,9 +111,7 @@ func TestTopupReturnsErrorIfAutoDetectFails(t *testing.T) {
 func TestTopupCallsWithOperatorIfAutoDetectSucceeds(t *testing.T) {
 	dat, _ := ioutil.ReadFile("test/airtel.json")
 	airtel := string(dat)
-
 	done := make(chan bool)
-
 	ts, mux := TestServerMux()
 
 	mux.HandleFunc("/operators/auto-detect/phone/+123/countries/IN", func(w http.ResponseWriter, r *http.Request) {
@@ -153,7 +141,6 @@ func TestTopupCallsWithOperatorIfAutoDetectSucceeds(t *testing.T) {
 
 func TestTopupBySuggestedAmountReturnsErrorOnEmptyAmounts(t *testing.T) {
 	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request) {})
-
 	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
 	op := Operator{Name: "Foodafone", DenominationType: "FIXED"}
 	_, err := svc.Topups().SuggestedAmount(50).Operator(&op).Topup("+123", 100)
@@ -166,7 +153,6 @@ func TestTopupBySuggestedAmountReturnsErrorOnEmptyAmounts(t *testing.T) {
 func TestTopupBySuggestedAmountReturnsErrorOnAmountOutOfRange(t *testing.T) {
 
 	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request) {
-
 		expected := `{"recipientPhone":{"countryCode":"IN","number":"+123"},"operatorId":211,"amount":1.82}`
 
 		data, _ := ioutil.ReadAll(r.Body)
@@ -178,14 +164,12 @@ func TestTopupBySuggestedAmountReturnsErrorOnAmountOutOfRange(t *testing.T) {
 	})
 
 	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
-
 	op := Operator{
 		Name:             "Foodafone",
 		DenominationType: "RANGE",
 		LocalMinAmount:   0,
 		LocalMaxAmount:   50,
 	}
-
 	_, err := svc.Topups().SuggestedAmount(50).Operator(&op).Topup("+123", 100)
 
 	assert.NotNil(t, err)
@@ -197,7 +181,6 @@ func TestTopupBySuggestedAmountReturnsErrorOnAmountOutOfRange(t *testing.T) {
 func TestTopupBySuggestedAmountSendsRequestForGoodAmount(t *testing.T) {
 
 	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request) {
-
 		expected := `{"recipientPhone":{"countryCode":"IN","number":"+123"},"operatorId":211,"amount":1.82}`
 
 		data, _ := ioutil.ReadAll(r.Body)
@@ -209,7 +192,6 @@ func TestTopupBySuggestedAmountSendsRequestForGoodAmount(t *testing.T) {
 	})
 
 	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
-
 	op := getOperators()[5]
 	_, err := svc.Topups().SuggestedAmount(50).Operator(&op).Topup("+123", 100)
 
@@ -219,7 +201,6 @@ func TestTopupBySuggestedAmountSendsRequestForGoodAmount(t *testing.T) {
 func TestTopupBySuggestedAmountSendsAmountIfInRange(t *testing.T) {
 
 	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request) {
-
 		expected := `{"recipientPhone":{"countryCode":"IN","number":"+123"},"operatorId":211,"amount":0.48}`
 
 		data, _ := ioutil.ReadAll(r.Body)
@@ -231,7 +212,6 @@ func TestTopupBySuggestedAmountSendsAmountIfInRange(t *testing.T) {
 	})
 
 	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
-
 	op := Operator{
 		OperatorID:       211,
 		Name:             "Foodafone",
@@ -241,7 +221,6 @@ func TestTopupBySuggestedAmountSendsAmountIfInRange(t *testing.T) {
 		LocalMinAmount:   0,
 		LocalMaxAmount:   50,
 	}
-
 	_, err := svc.Topups().SuggestedAmount(5).Operator(&op).Topup("+123", 25)
 
 	assert.Nil(t, err)
@@ -250,9 +229,7 @@ func TestTopupBySuggestedAmountSendsAmountIfInRange(t *testing.T) {
 func TestTopupWithAutoFallbackReCallsWithNewOperatorId(t *testing.T) {
 	dat, _ := ioutil.ReadFile("test/airtel.json")
 	airtel := string(dat)
-
 	done := make(chan bool)
-
 	ts, mux := TestServerMux()
 
 	mux.HandleFunc("/operators/auto-detect/phone/+123/countries/IN", func(w http.ResponseWriter, r *http.Request) {
@@ -292,8 +269,10 @@ func TestTopupWithAutoFallbackReCallsWithNewOperatorId(t *testing.T) {
 		}
 		count++
 	})
+
 	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
 	op := Operator{Name: "Foodafone", OperatorID: 1, Country: Country{"IN", "India"}}
 	_, err := svc.Topups().Operator(&op).AutoFallback().Topup("+123", 100)
+
 	assert.Nil(t, err)
 }

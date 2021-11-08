@@ -22,5 +22,6 @@ func LoadService(cmd *cobra.Command) (*reloadly.Service, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return svc, nil
 }

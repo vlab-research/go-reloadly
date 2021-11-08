@@ -122,11 +122,6 @@ func (s *TopupsService) AutoFallback() *TopupsService {
 	return s
 }
 
-func NormalizeNumber(number string) (string, error) {
-	// normalize
-	return number, nil
-}
-
 func checkRangeAmount(operator *Operator, amount float64) (float64, error) {
 	min := operator.LocalMinAmount
 	max := operator.LocalMaxAmount
@@ -199,8 +194,8 @@ func tryAutoFallback(err error) bool {
 	return false
 }
 
-func (s *TopupsService) Topup(mobile string, requested_amount float64) (*TopupResponse, error) {
-	amount := requested_amount
+func (s *TopupsService) Topup(mobile string, requestedAmount float64) (*TopupResponse, error) {
+	amount := requestedAmount
 
 	if s.error != nil {
 		return nil, s.error
@@ -222,7 +217,7 @@ func (s *TopupsService) Topup(mobile string, requested_amount float64) (*TopupRe
 	// It's confusing the way tolerance is overloaded.
 	// needs some rethinking.
 	if s.suggestedAmount {
-		a, err := GetSuggestedAmount(s.operator, requested_amount, s.tolerance)
+		a, err := GetSuggestedAmount(s.operator, requestedAmount, s.tolerance)
 		if err != nil {
 			return nil, err
 		}
@@ -244,5 +239,5 @@ func (s *TopupsService) Topup(mobile string, requested_amount float64) (*TopupRe
 	}
 
 	// try with auto detect!
-	return s.AutoDetect(s.operator.Country.IsoName).Topup(mobile, requested_amount)
+	return s.AutoDetect(s.operator.Country.IsoName).Topup(mobile, requestedAmount)
 }
