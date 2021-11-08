@@ -54,3 +54,22 @@ svc.Topup("+3441983489", operator, 10)
 ### Topups using suggested amounts
 
 This is useful...
+
+## Development
+
+### Requirements
+
+Before we get started, make sure you have Docker installed in your local computer. If you don't already have Docker installed, visit https://docs.docker.com/get-docker.
+
+### Local environment
+
+This project supports hot reloading. Hot reloading allows you to run tests automatically while editing files, enabling an interactive TDD workflow.
+
+To start the hot reload workflow, navigate to your terminal and type `./test.sh`. Once it is running, any editing of a file will trigger the test suite.
+
+### Pre-commit hooks
+
+To keep coding style consistent throughout the code base, this project uses a pre-commit hook, which runs style-correction libraries on every commit to the code base.
+
+To setup the pre-commit hook, navigate to your terminal and type, `git config core.hooksPath $(pwd)`.
+
