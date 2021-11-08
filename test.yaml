@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  main:
+    image: go-reloadly
+    build: .
+    command: |
+      sh -c '
+        echo "Running tests..."
+        go mod tidy
+        if [ "${IS_CI}" = "" ]
+        then
+          go test ./... || true
+          looper
+        fi
+        go test ./...
+      '
+    volumes:
+      - ./:/app
