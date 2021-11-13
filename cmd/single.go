@@ -11,7 +11,8 @@ import (
 
 var singleCmd = &cobra.Command{
 	Use:   "single",
-	Short: "A brief description of your command",
+	Short: "Make airtime recharge to a single mobile number",
+	Long:  "Make airtime recharge to a single mobile number",
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 3 {
 			return errors.New("requires at least mobile and amount and country")

@@ -66,10 +66,10 @@ func BatchTopup(svc *reloadly.Service, numWorkers int, jobs []reloadly.TopupJob)
 	return res
 }
 
-// batchCmd represents the batch command
 var batchCmd = &cobra.Command{
 	Use:   "batch",
-	Short: "A brief description of your command",
+	Short: "Make airtime recharges to multiple mobile numbers using a CSV file",
+	Long:  "Make airtime recharges to multiple mobile numbers using a CSV file",
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 2 {
 			return errors.New("requires 2 positional args [input csv] and [output csv]")

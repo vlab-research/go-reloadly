@@ -9,11 +9,10 @@ import (
 	"github.com/vlab-research/go-reloadly/reloadly"
 )
 
-// operatorsCmd represents the operators command
 var operatorsCmd = &cobra.Command{
 	Use:   "operators",
-	Short: "Check operator support for a given amount.",
-	Long:  "Check operator support for a given amount.",
+	Short: "Check operator support for a given amount",
+	Long:  "Check operator support for a given amount",
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 3 {
 			return errors.New("requires country and amount and tolerance")

@@ -11,11 +11,10 @@ import (
 )
 
 var cfgFile string
-
-// rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "reloadly",
-	Short: "A brief description of your application",
+	Short: "go-reloadly is a tool for managing Reloadly services",
+	Long:  "go-reloadly is a tool for managing Reloadly services",
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
