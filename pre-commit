@@ -1,8 +1,11 @@
 PATH=$PATH:/usr/local/bin:/usr/local/sbin
 
-docker build \
-	-t go-reloadly \
-	. &> /dev/null
+if [[ "$(docker images -q go-reloadly 2> /dev/null)" == "" ]];
+then
+	docker build \
+		-t go-reloadly \
+		. &> /dev/null
+fi
 
 res=$(docker run \
 	-v $(pwd):/app \
