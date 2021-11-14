@@ -77,13 +77,13 @@ var batchCmd = &cobra.Command{
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
+		input := args[0]
+		output := args[1]
+
 		svc, err := LoadService(cmd)
 		if err != nil {
 			return err
 		}
-
-		input := args[0]
-		output := args[1]
 
 		details, err := LoadBatchCsv(input)
 		if err != nil {
