@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"net/http"
 	"sort"
 	"strings"
 	"time"
@@ -78,10 +79,23 @@ type TopupsService struct {
 	country         string
 	tolerance       float64
 	error           error
+	acceptHeader    string
+}
+
+func NewTopups() *Service {
+	return &Service{
+		http.DefaultClient,
+		"https://topups.reloadly.com",
+		"https://auth.reloadly.com",
+		nil,
+		"",
+		"",
+		"https://topups-sandbox.reloadly.com",
+	}
 }
 
 func (s *Service) Topups() *TopupsService {
-	return &TopupsService{s, false, false, false, nil, "", 0.0, nil}
+	return &TopupsService{s, false, false, false, nil, "", 0.0, nil, "application/com.reloadly.topups-v1+json"}
 }
 
 func (s *TopupsService) New() *TopupsService {
@@ -231,7 +245,7 @@ func (s *TopupsService) Topup(mobile string, requestedAmount float64) (*TopupRes
 	}
 
 	resp := new(TopupResponse)
-	_, err := s.Request("POST", "/topups", req, resp)
+	_, err := s.Request("POST", "/topups", req, resp, s.acceptHeader)
 
 	// add retries??
 	if err == nil || s.autoFallback == false || !tryAutoFallback(err) {

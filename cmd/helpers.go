@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -13,6 +14,10 @@ func LoadTopupsService(cmd *cobra.Command) (*reloadly.Service, error) {
 	return loadService(cmd, svc)
 }
 
+func LoadGiftCardService(cmd *cobra.Command) (*reloadly.Service, error) {
+	svc := reloadly.NewGiftCards()
+	return loadService(cmd, svc)
+}
 
 func loadService(cmd *cobra.Command, svc *reloadly.Service) (*reloadly.Service, error) {
 	sandbox, err := cmd.Flags().GetBool("sandbox")
@@ -32,4 +37,13 @@ func loadService(cmd *cobra.Command, svc *reloadly.Service) (*reloadly.Service, 
 	fmt.Println("Authorized with Reloadly")
 
 	return svc, nil
+}
+
+func PrettyPrint(object interface{}) error {
+	b, err := json.MarshalIndent(object, "", "  ")
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(b))
+	return nil
 }

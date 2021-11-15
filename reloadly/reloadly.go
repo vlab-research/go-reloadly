@@ -9,27 +9,17 @@ import (
 )
 
 type Service struct {
-	Client  *http.Client
-	BaseUrl string
-	AuthUrl string
-	Token   *Token
-	id      string
-	secret  string
-}
-
-func New() *Service {
-	return &Service{
-		http.DefaultClient,
-		"https://topups.reloadly.com",
-		"https://auth.reloadly.com",
-		nil,
-		"",
-		"",
-	}
+	Client     *http.Client
+	BaseUrl    string
+	AuthUrl    string
+	Token      *Token
+	id         string
+	secret     string
+	sandboxUrl string
 }
 
 func (s *Service) Sandbox() {
-	s.BaseUrl = "https://topups-sandbox.reloadly.com"
+	s.BaseUrl = s.sandboxUrl
 }
 
 func (s *Service) request(sli *sling.Sling, method, path string, params interface{}, resp interface{}) (*http.Response, error) {
@@ -67,10 +57,10 @@ func (s *Service) request(sli *sling.Sling, method, path string, params interfac
 	return httpResponse, nil
 }
 
-func (s *Service) Request(method, path string, params interface{}, resp interface{}) (*http.Response, error) {
+func (s *Service) Request(method, path string, params interface{}, resp interface{}, acceptHeader string) (*http.Response, error) {
 
 	op := func() (*http.Response, error) {
-		sli := sling.New().Client(s.Client).Base(s.BaseUrl).Set("Accept", "application/com.reloadly.topups-v1+json")
+		sli := sling.New().Client(s.Client).Base(s.BaseUrl).Set("Accept", acceptHeader)
 
 		if s.Token != nil {
 			auth := fmt.Sprintf("%v %v", s.Token.TokenType, s.Token.AccessToken)

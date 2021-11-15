@@ -91,7 +91,7 @@ func (s *TopupsService) OperatorsAutoDetect(mobile, country string) (*Operator, 
 	path := fmt.Sprintf("/operators/auto-detect/phone/%v/countries/%v", mobile, country)
 	params := &OperatorsParams{SuggestedAmountsMap: true, SuggestedAmounts: true}
 	resp := new(Operator)
-	_, err := s.Request("GET", path, params, resp)
+	_, err := s.Request("GET", path, params, resp, s.acceptHeader)
 	return resp, err
 }
 
@@ -99,7 +99,7 @@ func (s *TopupsService) OperatorsByCountry(country string) ([]Operator, error) {
 	path := fmt.Sprintf("/operators/countries/%v", country)
 	params := &OperatorsParams{SuggestedAmountsMap: true, SuggestedAmounts: true}
 	resp := new([]Operator)
-	_, err := s.Request("GET", path, params, resp)
+	_, err := s.Request("GET", path, params, resp, s.acceptHeader)
 	return *resp, err
 }
 
