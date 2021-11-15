@@ -127,9 +127,9 @@ func checkRangeAmount(operator *Operator, amount float64) (float64, error) {
 	max := operator.LocalMaxAmount
 
 	if amount >= min && amount <= max {
-		upper_lim := amount / operator.Fx.Rate
-		upper_lim = math.Ceil(upper_lim*100) / 100
-		return upper_lim, nil
+		upper := amount / operator.Fx.Rate
+		upper = math.Ceil(upper*100) / 100
+		return upper, nil
 	}
 
 	return 0, ReloadlyError{
