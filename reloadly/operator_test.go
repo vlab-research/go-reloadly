@@ -21,7 +21,7 @@ func TestGetOperatorsByCountry(t *testing.T) {
 	})
 
 	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
-	res, err := svc.OperatorsByCountry("IN")
+	res, err := svc.Topups().OperatorsByCountry("IN")
 
 	assert.Nil(t, err)
 	assert.Equal(t, "Airtel India", res[0].Name)
@@ -40,7 +40,7 @@ func TestSearchOperatorWhenFoundReturnsOperator(t *testing.T) {
 	})
 
 	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
-	res, err := svc.SearchOperator("IN", "Reliance Jio India Bundles")
+	res, err := svc.Topups().SearchOperator("IN", "Reliance Jio India Bundles")
 
 	assert.Nil(t, err)
 	assert.Equal(t, "Reliance Jio India Bundles", res.Name)
@@ -59,7 +59,7 @@ func TestSearchOperatorWhenNotFoundReturnsError(t *testing.T) {
 	})
 
 	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
-	_, err := svc.SearchOperator("IN", "fooo")
+	_, err := svc.Topups().SearchOperator("IN", "fooo")
 
 	assert.NotNil(t, err)
 	assert.Equal(t, err.(ReloadlyError).ErrorCode, "OPERATOR_NOT_FOUND")
