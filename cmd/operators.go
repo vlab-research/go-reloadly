@@ -32,7 +32,7 @@ var operatorsCmd = &cobra.Command{
 			return err
 		}
 
-		svc, err := LoadService(cmd)
+		svc, err := LoadTopupsService(cmd)
 		if err != nil {
 			return err
 		}
