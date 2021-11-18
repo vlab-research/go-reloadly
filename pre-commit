@@ -1,0 +1,24 @@
+PATH=$PATH:/usr/local/bin:/usr/local/sbin
+
+if [[ "$(docker images -q go-reloadly 2> /dev/null)" == "" ]];
+then
+	docker build \
+		-t go-reloadly \
+		. &> /dev/null
+fi
+
+res=$(docker run \
+	-v $(pwd):/app \
+	-t go-reloadly \
+	sh -c '
+		files=$(git diff --cached --name-only --diff-filter=ACM | grep ".go$")
+		[ -z "$files" ] && exit
+		[ -z "$(goimports -l $files)" ] && exit
+
+		echo "The source code must be formatted before committing."
+		echo "To fix formatting issues, run: ./format.sh"
+	')
+
+[ -z "$res" ] && exit
+echo $res
+exit 1
