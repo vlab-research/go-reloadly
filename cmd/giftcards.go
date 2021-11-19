@@ -29,7 +29,7 @@ var productsCmd = &cobra.Command{
 			return err
 		}
 
-		svc, err := LoadGiftCardService(cmd)
+		svc, err := LoadGiftCardsService(cmd)
 		if err != nil {
 			return err
 		}
@@ -60,7 +60,7 @@ var productCmd = &cobra.Command{
 			return err
 		}
 
-		svc, err := LoadGiftCardService(cmd)
+		svc, err := LoadGiftCardsService(cmd)
 		if err != nil {
 			return err
 		}
@@ -88,7 +88,7 @@ var productsByCountryCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		country := args[0]
 
-		svc, err := LoadGiftCardService(cmd)
+		svc, err := LoadGiftCardsService(cmd)
 		if err != nil {
 			return err
 		}
@@ -108,7 +108,7 @@ var redeemInstructionsCmd = &cobra.Command{
 	Short: "Provides details on how to redeem a gift card",
 	Long:  "Provides details on how to redeem a gift card",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		svc, err := LoadGiftCardService(cmd)
+		svc, err := LoadGiftCardsService(cmd)
 		if err != nil {
 			return err
 		}
@@ -139,7 +139,7 @@ var redeemInstructionsByBrandCmd = &cobra.Command{
 			return err
 		}
 
-		svc, err := LoadGiftCardService(cmd)
+		svc, err := LoadGiftCardsService(cmd)
 		if err != nil {
 			return err
 		}
@@ -169,7 +169,7 @@ var discountsCmd = &cobra.Command{
 			return err
 		}
 
-		svc, err := LoadGiftCardService(cmd)
+		svc, err := LoadGiftCardsService(cmd)
 		if err != nil {
 			return err
 		}
@@ -200,7 +200,7 @@ var discountByProductCmd = &cobra.Command{
 			return err
 		}
 
-		svc, err := LoadGiftCardService(cmd)
+		svc, err := LoadGiftCardsService(cmd)
 		if err != nil {
 			return err
 		}
@@ -230,7 +230,7 @@ var transactionsCmd = &cobra.Command{
 			return err
 		}
 
-		svc, err := LoadGiftCardService(cmd)
+		svc, err := LoadGiftCardsService(cmd)
 		if err != nil {
 			return err
 		}
@@ -261,7 +261,7 @@ var transactionCmd = &cobra.Command{
 			return err
 		}
 
-		svc, err := LoadGiftCardService(cmd)
+		svc, err := LoadGiftCardsService(cmd)
 		if err != nil {
 			return err
 		}
@@ -308,7 +308,7 @@ var orderGiftCardCmd = &cobra.Command{
 		senderName := args[5]
 		recipientEmail := args[6]
 
-		svc, err := LoadGiftCardService(cmd)
+		svc, err := LoadGiftCardsService(cmd)
 		if err != nil {
 			return err
 		}
@@ -340,7 +340,7 @@ var getRedeemCodeCmd = &cobra.Command{
 			return err
 		}
 
-		svc, err := LoadGiftCardService(cmd)
+		svc, err := LoadGiftCardsService(cmd)
 		if err != nil {
 			return err
 		}

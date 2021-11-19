@@ -14,7 +14,7 @@ func LoadTopupsService(cmd *cobra.Command) (*reloadly.Service, error) {
 	return loadService(cmd, svc)
 }
 
-func LoadGiftCardService(cmd *cobra.Command) (*reloadly.Service, error) {
+func LoadGiftCardsService(cmd *cobra.Command) (*reloadly.Service, error) {
 	svc := reloadly.NewGiftCards()
 	return loadService(cmd, svc)
 }
