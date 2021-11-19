@@ -79,7 +79,6 @@ type TopupsService struct {
 	country         string
 	tolerance       float64
 	error           error
-	acceptHeader    string
 }
 
 func NewTopups() *Service {
@@ -91,11 +90,12 @@ func NewTopups() *Service {
 		"",
 		"",
 		"https://topups-sandbox.reloadly.com",
+		"application/com.reloadly.topups-v1+json",
 	}
 }
 
 func (s *Service) Topups() *TopupsService {
-	return &TopupsService{s, false, false, false, nil, "", 0.0, nil, "application/com.reloadly.topups-v1+json"}
+	return &TopupsService{s, false, false, false, nil, "", 0.0, nil}
 }
 
 func (s *TopupsService) New() *TopupsService {
@@ -245,7 +245,7 @@ func (s *TopupsService) Topup(mobile string, requestedAmount float64) (*TopupRes
 	}
 
 	resp := new(TopupResponse)
-	_, err := s.Request("POST", "/topups", req, resp, s.acceptHeader)
+	_, err := s.Request("POST", "/topups", req, resp)
 
 	// add retries??
 	if err == nil || s.autoFallback == false || !tryAutoFallback(err) {

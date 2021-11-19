@@ -9,13 +9,14 @@ import (
 )
 
 type Service struct {
-	Client     *http.Client
-	BaseUrl    string
-	AuthUrl    string
-	Token      *Token
-	id         string
-	secret     string
-	sandboxUrl string
+	Client       *http.Client
+	BaseUrl      string
+	AuthUrl      string
+	Token        *Token
+	id           string
+	secret       string
+	sandboxUrl   string
+	acceptHeader string
 }
 
 func (s *Service) Sandbox() {
@@ -57,10 +58,10 @@ func (s *Service) request(sli *sling.Sling, method, path string, params interfac
 	return httpResponse, nil
 }
 
-func (s *Service) Request(method, path string, params interface{}, resp interface{}, acceptHeader string) (*http.Response, error) {
+func (s *Service) Request(method, path string, params interface{}, resp interface{}) (*http.Response, error) {
 
 	op := func() (*http.Response, error) {
-		sli := sling.New().Client(s.Client).Base(s.BaseUrl).Set("Accept", acceptHeader)
+		sli := sling.New().Client(s.Client).Base(s.BaseUrl).Set("Accept", s.acceptHeader)
 
 		if s.Token != nil {
 			auth := fmt.Sprintf("%v %v", s.Token.TokenType, s.Token.AccessToken)

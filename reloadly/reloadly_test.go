@@ -100,7 +100,7 @@ func TestRequestDoesReAuthOnErrorCodeTOKEN_EXPIRED(t *testing.T) {
 	err := svc.Auth("id", "secret")
 	assert.Nil(t, err)
 
-	_, err = svc.Request("GET", "/foo", new(struct{}), resp, "")
+	_, err = svc.Request("GET", "/foo", new(struct{}), resp)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 2, authCount)

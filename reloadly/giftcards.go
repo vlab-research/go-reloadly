@@ -96,7 +96,6 @@ type Card struct {
 
 type GiftCardsService struct {
 	*Service
-	acceptHeader string
 }
 
 func NewGiftCards() *Service {
@@ -108,17 +107,18 @@ func NewGiftCards() *Service {
 		"",
 		"",
 		"https://giftcards-sandbox.reloadly.com",
+		"application/com.reloadly.giftcards-v1+json",
 	}
 }
 
 func (s *Service) GiftCards() *GiftCardsService {
-	return &GiftCardsService{s, "application/com.reloadly.giftcards-v1+json"}
+	return &GiftCardsService{s}
 }
 
 func (s *GiftCardsService) Products(page int64, size int64) (ProductsPage, error) {
 	path := fmt.Sprintf("/products?page=%v&size=%v", page, size)
 	resp := new(ProductsPage)
-	_, err := s.Request("GET", path, nil, resp, s.acceptHeader)
+	_, err := s.Request("GET", path, nil, resp)
 	resp.Page = page
 	return *resp, err
 }
@@ -126,34 +126,34 @@ func (s *GiftCardsService) Products(page int64, size int64) (ProductsPage, error
 func (s *GiftCardsService) Product(productId int64) (Product, error) {
 	path := fmt.Sprintf("/products/%v", productId)
 	resp := new(Product)
-	_, err := s.Request("GET", path, nil, resp, s.acceptHeader)
+	_, err := s.Request("GET", path, nil, resp)
 	return *resp, err
 }
 
 func (s *GiftCardsService) ProductsByCountry(country string) ([]Product, error) {
 	path := fmt.Sprintf("/countries/%v/products", country)
 	resp := new([]Product)
-	_, err := s.Request("GET", path, nil, resp, s.acceptHeader)
+	_, err := s.Request("GET", path, nil, resp)
 	return *resp, err
 }
 
 func (s *GiftCardsService) RedeemInstructions() ([]RedeemInstructions, error) {
 	resp := new([]RedeemInstructions)
-	_, err := s.Request("GET", "/redeem-instructions", nil, resp, s.acceptHeader)
+	_, err := s.Request("GET", "/redeem-instructions", nil, resp)
 	return *resp, err
 }
 
 func (s *GiftCardsService) RedeemInstructionsByBrand(brandId int64) (RedeemInstructions, error) {
 	path := fmt.Sprintf("/redeem-instructions/%v", brandId)
 	resp := new(RedeemInstructions)
-	_, err := s.Request("GET", path, nil, resp, s.acceptHeader)
+	_, err := s.Request("GET", path, nil, resp)
 	return *resp, err
 }
 
 func (s *GiftCardsService) Discounts(page int64, size int64) (DiscountsPage, error) {
 	path := fmt.Sprintf("/discounts?page=%v&size=%v", page, size)
 	resp := new(DiscountsPage)
-	_, err := s.Request("GET", path, nil, resp, s.acceptHeader)
+	_, err := s.Request("GET", path, nil, resp)
 	resp.Page = page
 	return *resp, err
 }
@@ -161,14 +161,14 @@ func (s *GiftCardsService) Discounts(page int64, size int64) (DiscountsPage, err
 func (s *GiftCardsService) DiscountByProduct(productId int64) (Discount, error) {
 	path := fmt.Sprintf("/products/%v/discounts", productId)
 	resp := new(Discount)
-	_, err := s.Request("GET", path, nil, resp, s.acceptHeader)
+	_, err := s.Request("GET", path, nil, resp)
 	return *resp, err
 }
 
 func (s *GiftCardsService) Transactions(page int64, size int64) (TransactionsPage, error) {
 	path := fmt.Sprintf("/reports/transactions?page=%v&size=%v", page, size)
 	resp := new(TransactionsPage)
-	_, err := s.Request("GET", path, nil, resp, s.acceptHeader)
+	_, err := s.Request("GET", path, nil, resp)
 	resp.Page = page
 	return *resp, err
 }
@@ -176,19 +176,19 @@ func (s *GiftCardsService) Transactions(page int64, size int64) (TransactionsPag
 func (s *GiftCardsService) Transaction(transactionId int64) (Transaction, error) {
 	path := fmt.Sprintf("/reports/transactions/%v", transactionId)
 	resp := new(Transaction)
-	_, err := s.Request("GET", path, nil, resp, s.acceptHeader)
+	_, err := s.Request("GET", path, nil, resp)
 	return *resp, err
 }
 
 func (s *GiftCardsService) Order(order GiftCardOrder) (Transaction, error) {
 	resp := new(Transaction)
-	_, err := s.Request("POST", "/orders", order, resp, s.acceptHeader)
+	_, err := s.Request("POST", "/orders", order, resp)
 	return *resp, err
 }
 
 func (s *GiftCardsService) GetRedeemCode(transactionId int64) ([]Card, error) {
 	path := fmt.Sprintf("/orders/transactions/%v/cards", transactionId)
 	resp := new([]Card)
-	_, err := s.Request("GET", path, nil, resp, s.acceptHeader)
+	_, err := s.Request("GET", path, nil, resp)
 	return *resp, err
 }
