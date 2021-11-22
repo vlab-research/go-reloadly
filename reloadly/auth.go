@@ -26,7 +26,7 @@ func (s *Service) GetOAuthToken(clientId, clientSecret string) (*Token, error) {
 
 	sli := sling.New().Client(s.Client).Base(s.AuthUrl)
 
-	_, err := s.request(sli, "POST", "oauth/token", body, token)
+	_, err := s.request(sli, "POST", "/oauth/token", body, token)
 	return token, err
 }
 

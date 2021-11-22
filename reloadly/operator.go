@@ -87,7 +87,7 @@ type OperatorsParams struct {
 	IncludePin          bool `url:"includePin,omitempty"`
 }
 
-func (s *Service) OperatorsAutoDetect(mobile, country string) (*Operator, error) {
+func (s *TopupsService) OperatorsAutoDetect(mobile, country string) (*Operator, error) {
 	path := fmt.Sprintf("/operators/auto-detect/phone/%v/countries/%v", mobile, country)
 	params := &OperatorsParams{SuggestedAmountsMap: true, SuggestedAmounts: true}
 	resp := new(Operator)
@@ -95,7 +95,7 @@ func (s *Service) OperatorsAutoDetect(mobile, country string) (*Operator, error)
 	return resp, err
 }
 
-func (s *Service) OperatorsByCountry(country string) ([]Operator, error) {
+func (s *TopupsService) OperatorsByCountry(country string) ([]Operator, error) {
 	path := fmt.Sprintf("/operators/countries/%v", country)
 	params := &OperatorsParams{SuggestedAmountsMap: true, SuggestedAmounts: true}
 	resp := new([]Operator)
@@ -103,7 +103,7 @@ func (s *Service) OperatorsByCountry(country string) ([]Operator, error) {
 	return *resp, err
 }
 
-func (s *Service) SearchOperator(country, name string) (*Operator, error) {
+func (s *TopupsService) SearchOperator(country, name string) (*Operator, error) {
 	ops, err := s.OperatorsByCountry(country)
 	if err != nil {
 		return nil, err

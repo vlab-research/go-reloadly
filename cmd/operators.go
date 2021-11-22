@@ -32,12 +32,12 @@ var operatorsCmd = &cobra.Command{
 			return err
 		}
 
-		svc, err := LoadService(cmd)
+		svc, err := LoadTopupsService(cmd)
 		if err != nil {
 			return err
 		}
 
-		ops, err := svc.OperatorsByCountry(country)
+		ops, err := svc.Topups().OperatorsByCountry(country)
 		if err != nil {
 			return err
 		}
@@ -57,5 +57,5 @@ var operatorsCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(operatorsCmd)
+	topupsCmd.AddCommand(operatorsCmd)
 }

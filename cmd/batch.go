@@ -80,7 +80,7 @@ var batchCmd = &cobra.Command{
 		input := args[0]
 		output := args[1]
 
-		svc, err := LoadService(cmd)
+		svc, err := LoadTopupsService(cmd)
 		if err != nil {
 			return err
 		}

@@ -1,0 +1,51 @@
+{
+	"content": [
+		{
+			"productId": 5904,
+			"productName": "Microsoft 365 Personal",
+			"global": true,
+			"senderFee": 37.16,
+			"discountPercentage": 14.0,
+			"denominationType": "FIXED",
+			"recipientCurrencyCode": "USD",
+			"minRecipientDenomination": null,
+			"maxRecipientDenomination": null,
+			"senderCurrencyCode": "INR",
+			"minSenderDenomination": null,
+			"maxSenderDenomination": null,
+			"fixedRecipientDenominations": [69.99],
+			"fixedSenderDenominations": [5202.36],
+			"fixedRecipientToSenderDenominationsMap": { "69.99": 5202.36 },
+			"logoUrls": [
+				"https://cdn.reloadly.com/giftcards/c739c292-76ec-40f9-81ec-6071f9b631f5.jpg"
+			],
+			"brand": { "brandId": 36, "brandName": "Microsoft 365 & Office" },
+			"country": {
+				"isoName": "AS",
+				"name": "American Samoa",
+				"flagUrl": "https://s3.amazonaws.com/rld-flags/as.svg"
+			},
+			"redeemInstruction": {
+				"concise": "Sign in to redeem.microsoft.com with your Microsoft account and enter the 25-character code",
+				"verbose": "The easiest way to redeem a gift card or code is online. Sign in to redeem.microsoft.com with your Microsoft account, enter the 25-character code, and then select Next."
+			}
+		}
+	],
+	"pageable": {
+		"sort": { "sorted": false, "unsorted": true, "empty": true },
+		"pageNumber": 1,
+		"pageSize": 1,
+		"offset": 0,
+		"unpaged": false,
+		"paged": true
+	},
+	"totalPages": 1,
+	"last": true,
+	"totalElements": 1,
+	"first": false,
+	"sort": { "sorted": false, "unsorted": true, "empty": true },
+	"numberOfElements": 1,
+	"size": 1,
+	"number": 1,
+	"empty": false
+}

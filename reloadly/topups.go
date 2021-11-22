@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"net/http"
 	"sort"
 	"strings"
 	"time"
@@ -80,6 +81,19 @@ type TopupsService struct {
 	error           error
 }
 
+func NewTopups() *Service {
+	return &Service{
+		http.DefaultClient,
+		"https://topups.reloadly.com",
+		"https://auth.reloadly.com",
+		nil,
+		"",
+		"",
+		"https://topups-sandbox.reloadly.com",
+		"application/com.reloadly.topups-v1+json",
+	}
+}
+
 func (s *Service) Topups() *TopupsService {
 	return &TopupsService{s, false, false, false, nil, "", 0.0, nil}
 }
@@ -127,9 +141,9 @@ func checkRangeAmount(operator *Operator, amount float64) (float64, error) {
 	max := operator.LocalMaxAmount
 
 	if amount >= min && amount <= max {
-		upper_lim := amount / operator.Fx.Rate
-		upper_lim = math.Ceil(upper_lim*100) / 100
-		return upper_lim, nil
+		upper := amount / operator.Fx.Rate
+		upper = math.Ceil(upper*100) / 100
+		return upper, nil
 	}
 
 	return 0, ReloadlyError{

@@ -29,12 +29,10 @@ var singleCmd = &cobra.Command{
 
 		country := args[2]
 
-		svc, err := LoadService(cmd)
+		svc, err := LoadTopupsService(cmd)
 		if err != nil {
 			return err
 		}
-
-		fmt.Println("Authorized with Reloadly")
 
 		operatorName, err := cmd.Flags().GetString("operator")
 		if err != nil {

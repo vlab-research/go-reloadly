@@ -1,0 +1,26 @@
+[
+	{
+		"brandId": 1,
+		"brandName": "1-800-PetSupplies",
+		"concise": "This card is redeemable for merchandise on www.1-800-petsupplies.com",
+		"verbose": "Your acceptance of this eCertificate constitutes your agreement to these terms and conditions. This card is redeemable in U.S. only for merchandise on www.1-800-petsupplies.com . Only two eCertificates are redeemable per order. eCertificates cannot be redeemed for cash, except as required by law. Void if altered or reproduced. This gift card is issued in U.S. funds by Tabcom, LLC. When Redeeming online please be sure to enter the entire gift card number including preceding zeros. The maximum number of eCertificates that can be used for phone is nine. By accepting these Terms and Conditions through your use of this Site, you certify that you reside in the United States and are 18 years of age or older. If you are under the age of 18 but at least 14 years of age you may use this Site only under the supervision of a parent or legal guardian who agrees to be bound by these Terms and Conditions."
+	},
+	{
+		"brandId": 2,
+		"brandName": "Amazon",
+		"concise": "Visit www.amazon.com/redeem and enter the Claim Code when prompted.",
+		"verbose": "Amazon.com Gift Cards never expire and can be redeemed towards millions of items at www.amazon.com &#13;To redeem your gift card, follow these steps: &#13;1. Visit www.amazon.com/redeem &#13;2. Enter the Claim Code when prompted. &#13;3. Gift card funds will be applied automatically to eligible orders during the checkout process. &#13;4. You must pay for any remaining balance on your order with another payment method. &#13;Your gift card claim code may also be entered when prompted during checkout. To redeem your gift card using the Amazon.com service, first add the gift card funds to Your Account. If you have questions about redeeming your gift card, please visit www.amazon.com/gc-redeem"
+	},
+	{
+		"brandId": 3,
+		"brandName": "App Store & iTunes",
+		"concise": "Go to apple.com/redeem to add to your Apple Account balance.",
+		"verbose": "Use it for purchases at any Apple Store location, on the Apple Store-app, apple.com, the App Store, iTunes, Apple Music, Apple TV, Apple News, Apple Books, Apple Arcade, iCloud, and other Apple properties. &#13;Use the Apple Gift Card for App Store, iTunes, iPhone, iPad, Air-pods, Mac book, accessories, and more. &#13;No returns or refunds on Apple Gift Cards. Terms apply. &#13;The Apple Gift Card can be used two ways: &#13;For online purchases, go to apple.com/redeem to add to your Apple Account balance. &#13;Bring this email to any Apple Store location. &#13;Beware of gift card scams. Do not share your code. Terms & Conditions Valid only for U.S. transactions in Apple properties. For assistance, visit support.apple.com/giftcard or call 1-800-275-2273. Not redeemable at Apple resellers or for cash, and no resale, refunds, or exchanges, except as required by law. Apple is not responsible for unauthorized use. Terms apply"
+	},
+	{
+		"brandId": 4,
+		"brandName": "Apple Music",
+		"concise": "Go to apple.com/redeem to add to your Apple Account balance.",
+		"verbose": "Beware of gift card scams. Do not share your code. For assistance, visit support.apple.com/gift ardor call 1-800-275-2273. Not redeemable at Apple resellers or for cash, and no resale, refunds, or exchanges, except as required by law. Apple is not responsible for unauthorized use. Terms apply"
+	}
+]

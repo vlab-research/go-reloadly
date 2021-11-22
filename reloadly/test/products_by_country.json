@@ -1,0 +1,62 @@
+[
+	{
+		"productId": 4,
+		"productName": "Amazon Spain",
+		"global": false,
+		"senderFee": 37.16,
+		"discountPercentage": 0.0,
+		"denominationType": "RANGE",
+		"recipientCurrencyCode": "EUR",
+		"minRecipientDenomination": 10.0,
+		"maxRecipientDenomination": 87.2916,
+		"senderCurrencyCode": "INR",
+		"minSenderDenomination": 851.5,
+		"maxSenderDenomination": 7432.88,
+		"fixedRecipientDenominations": [],
+		"fixedSenderDenominations": null,
+		"fixedRecipientToSenderDenominationsMap": null,
+		"logoUrls": [
+			"https://cdn.reloadly.com/giftcards/3a70931f-2823-4b2c-ab84-8e075134096d.jpg"
+		],
+		"brand": { "brandId": 2, "brandName": "Amazon" },
+		"country": {
+			"isoName": "ES",
+			"name": "Spain",
+			"flagUrl": "https://s3.amazonaws.com/rld-flags/es.svg"
+		},
+		"redeemInstruction": {
+			"concise": "Visit www.amazon.com/redeem and enter the Claim Code when prompted.",
+			"verbose": "Amazon.com Gift Cards never expire and can be redeemed towards millions of items at www.amazon.com &#13;To redeem your gift card, follow these steps: &#13;1. Visit www.amazon.com/redeem &#13;2. Enter the Claim Code when prompted. &#13;3. Gift card funds will be applied automatically to eligible orders during the checkout process. &#13;4. You must pay for any remaining balance on your order with another payment method. &#13;Your gift card claim code may also be entered when prompted during checkout. To redeem your gift card using the Amazon.com service, first add the gift card funds to Your Account. If you have questions about redeeming your gift card, please visit www.amazon.com/gc-redeem"
+		}
+	},
+	{
+		"productId": 11,
+		"productName": "App Store & iTunes Spain",
+		"global": false,
+		"senderFee": 37.16,
+		"discountPercentage": 2.9,
+		"denominationType": "RANGE",
+		"recipientCurrencyCode": "EUR",
+		"minRecipientDenomination": 5.0,
+		"maxRecipientDenomination": 87.2916,
+		"senderCurrencyCode": "INR",
+		"minSenderDenomination": 425.75,
+		"maxSenderDenomination": 7432.88,
+		"fixedRecipientDenominations": [],
+		"fixedSenderDenominations": null,
+		"fixedRecipientToSenderDenominationsMap": null,
+		"logoUrls": [
+			"https://cdn.reloadly.com/giftcards/efff4800-085b-463e-818b-64d22c599f8a.jpg"
+		],
+		"brand": { "brandId": 3, "brandName": "App Store & iTunes" },
+		"country": {
+			"isoName": "ES",
+			"name": "Spain",
+			"flagUrl": "https://s3.amazonaws.com/rld-flags/es.svg"
+		},
+		"redeemInstruction": {
+			"concise": "Go to apple.com/redeem to add to your Apple Account balance.",
+			"verbose": "Use it for purchases at any Apple Store location, on the Apple Store-app, apple.com, the App Store, iTunes, Apple Music, Apple TV, Apple News, Apple Books, Apple Arcade, iCloud, and other Apple properties. &#13;Use the Apple Gift Card for App Store, iTunes, iPhone, iPad, Air-pods, Mac book, accessories, and more. &#13;No returns or refunds on Apple Gift Cards. Terms apply. &#13;The Apple Gift Card can be used two ways: &#13;For online purchases, go to apple.com/redeem to add to your Apple Account balance. &#13;Bring this email to any Apple Store location. &#13;Beware of gift card scams. Do not share your code. Terms & Conditions Valid only for U.S. transactions in Apple properties. For assistance, visit support.apple.com/giftcard or call 1-800-275-2273. Not redeemable at Apple resellers or for cash, and no resale, refunds, or exchanges, except as required by law. Apple is not responsible for unauthorized use. Terms apply"
+		}
+	}
+]

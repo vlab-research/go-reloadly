@@ -1,0 +1,21 @@
+{
+	"transactionId": 563,
+	"amount": 4495.9253,
+	"discount": 265.29638,
+	"currencyCode": "INR",
+	"fee": 37.16255,
+	"recipientEmail": "test@test.com",
+	"customIdentifier": "test-card",
+	"status": "SUCCESSFUL",
+	"product": {
+		"productId": 157,
+		"productName": "CALL OF DUTY: MODERN WARFARE® STANDARD EDITION",
+		"countryCode": "UA",
+		"quantity": 1,
+		"unitPrice": 59.99,
+		"totalPrice": 59.99,
+		"currencyCode": "USD",
+		"brand": { "brandId": 6, "brandName": "CALL OF DUTY: MODERN WARFARE" }
+	},
+	"transactionCreatedTime": "2021-11-15 16:55:30"
+}
