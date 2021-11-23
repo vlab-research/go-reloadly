@@ -3,6 +3,8 @@ package reloadly
 import (
 	"fmt"
 	"net/http"
+	"strings"
+	"time"
 )
 
 type ProductsPage struct {
@@ -59,24 +61,37 @@ type TransactionsPage struct {
 	Size    int64         `json:"size,omitempty"`
 }
 
+type TransactionCreatedTime time.Time
+
+func (t *TransactionCreatedTime) UnmarshalJSON(b []byte) error {
+	format := "2006-01-02 15:04:05"
+	s := strings.Trim(string(b), "\"")
+	parsed, err := time.Parse(format, s)
+	if err != nil {
+		return err
+	}
+	*t = TransactionCreatedTime(parsed)
+	return nil
+}
+
 type Transaction struct {
-	TransactionId          int64   `json:"transactionId,omitempty"`
-	Amount                 float64 `json:"amount,omitempty"`
-	Discount               float64 `json:"discount,omitempty"`
-	CurrencyCode           string  `json:"currencyCode,omitempty"`
-	Fee                    float64 `json:"fee,omitempty"`
-	RecipientEmail         string  `json:"recipientEmail,omitempty"`
-	CustomIdentifier       string  `json:"customIdentifier,omitempty"`
-	Status                 string  `json:"status,omitempty"`
-	TransactionCreatedTime string  `json:"transactionCreatedTime,omitempty"`
-	ProductID              int64   `json:"productId,omitempty"`
-	ProductName            string  `json:"productName,omitempty"`
-	CountryCode            string  `json:"countryCode,omitempty"`
-	Quantity               int64   `json:"quantity,omitempty"`
-	UnitPrice              float64 `json:"unitPrice,omitempty"`
-	TotalPrice             float64 `json:"totalPrice,omitempty"`
-	BrandID                int64   `json:"brandId,omitempty"`
-	BrandName              string  `json:"brandName,omitempty"`
+	TransactionId          int64                   `json:"transactionId,omitempty"`
+	Amount                 float64                 `json:"amount,omitempty"`
+	Discount               float64                 `json:"discount,omitempty"`
+	CurrencyCode           string                  `json:"currencyCode,omitempty"`
+	Fee                    float64                 `json:"fee,omitempty"`
+	RecipientEmail         string                  `json:"recipientEmail,omitempty"`
+	CustomIdentifier       string                  `json:"customIdentifier,omitempty"`
+	Status                 string                  `json:"status,omitempty"`
+	TransactionCreatedTime *TransactionCreatedTime `json:"transactionCreatedTime,omitempty"`
+	ProductID              int64                   `json:"productId,omitempty"`
+	ProductName            string                  `json:"productName,omitempty"`
+	CountryCode            string                  `json:"countryCode,omitempty"`
+	Quantity               int64                   `json:"quantity,omitempty"`
+	UnitPrice              float64                 `json:"unitPrice,omitempty"`
+	TotalPrice             float64                 `json:"totalPrice,omitempty"`
+	BrandID                int64                   `json:"brandId,omitempty"`
+	BrandName              string                  `json:"brandName,omitempty"`
 }
 
 type GiftCardOrder struct {
