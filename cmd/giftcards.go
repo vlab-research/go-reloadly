@@ -313,7 +313,7 @@ var orderGiftCardCmd = &cobra.Command{
 			return err
 		}
 
-		order := reloadly.GiftCardOrder{productId, countryCode, quantity, unitPrice, customIdentifier, senderName, recipientEmail}
+		order := reloadly.GiftCardOrder{productId, countryCode, quantity, unitPrice, customIdentifier, senderName, recipientEmail, ""}
 		o, err := svc.GiftCards().Order(order)
 		if err != nil {
 			return err
