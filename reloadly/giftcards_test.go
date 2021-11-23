@@ -300,7 +300,7 @@ func TestOrder(t *testing.T) {
 	})
 
 	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
-	order := GiftCardOrder{157, "US", 1, 59.99, "test-card", "John Doe", "test@test.com"}
+	order := GiftCardOrder{157, "US", 1, 59.99, "test-card", "John Doe", "test@test.com", "test-id"}
 	res, err := svc.GiftCards().Order(order)
 
 	assert.Nil(t, err)

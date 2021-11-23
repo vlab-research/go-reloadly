@@ -87,6 +87,7 @@ type GiftCardOrder struct {
 	CustomIdentifier string  `json:"customIdentifier,omitempty"`
 	SenderName       string  `json:"senderName,omitempty"`
 	RecipientEmail   string  `json:"recipientEmail,omitempty"`
+	ID               string  `json:"id,omitempty"`
 }
 
 type Card struct {
