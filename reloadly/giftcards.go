@@ -95,14 +95,14 @@ type Transaction struct {
 }
 
 type GiftCardOrder struct {
-	ProductID        int64   `json:"productId,omitempty"`
-	CountryCode      string  `json:"countryCode,omitempty"`
-	Quantity         int64   `json:"quantity,omitempty"`
-	UnitPrice        float64 `json:"unitPrice,omitempty"`
-	CustomIdentifier string  `json:"customIdentifier,omitempty"`
-	SenderName       string  `json:"senderName,omitempty"`
-	RecipientEmail   string  `json:"recipientEmail,omitempty"`
-	ID               string  `json:"id,omitempty"`
+	ProductID        int64   `json:"productId" validate:"required"`
+	CountryCode      string  `json:"countryCode" validate:"required"`
+	Quantity         int64   `json:"quantity" validate:"required"`
+	UnitPrice        float64 `json:"unitPrice" validate:"required"`
+	CustomIdentifier string  `json:"customIdentifier" validate:"required"`
+	SenderName       string  `json:"senderName" validate:"required"`
+	RecipientEmail   string  `json:"recipientEmail" validate:"required"`
+	ID               string  `json:"id" validate:"required"`
 }
 
 type Card struct {
