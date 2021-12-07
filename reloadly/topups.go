@@ -136,10 +136,11 @@ func (s *TopupsService) AutoFallback() *TopupsService {
 	return s
 }
 
-func checkRangeAmount(operator *Operator, amount float64) (float64, error) {
+func checkLocalRangeAmount(operator *Operator, amount float64) (float64, error) {
 	min := operator.LocalMinAmount
 	max := operator.LocalMaxAmount
 
+	// if valid, convertt it to payment currency
 	if amount >= min && amount <= max {
 		upper := amount / operator.Fx.Rate
 		upper = math.Ceil(upper*100) / 100
@@ -150,6 +151,28 @@ func checkRangeAmount(operator *Operator, amount float64) (float64, error) {
 		ErrorCode: "IMPOSSIBLE_AMOUNT",
 		Message:   fmt.Sprintf("Operator %v has a minimum amount of %v and max of %v. Amount %v requested could not be fulfilled", operator.Name, min, max, amount),
 	}
+}
+
+func checkNonLocalRangeAmount(operator *Operator, amount float64) (float64, error) {
+	min := operator.MinAmount
+	max := operator.MaxAmount
+
+	if amount >= min && amount <= max {
+		return amount, nil
+	}
+
+	return 0, ReloadlyError{
+		ErrorCode: "IMPOSSIBLE_AMOUNT",
+		Message:   fmt.Sprintf("Operator %v has a minimum amount of %v and max of %v. Amount %v requested could not be fulfilled", operator.Name, min, max, amount),
+	}
+}
+
+func checkRangeAmount(operator *Operator, amount float64) (float64, error) {
+	if operator.SupportsLocalAmounts {
+		return checkLocalRangeAmount(operator, amount)
+	}
+
+	return checkNonLocalRangeAmount(operator, amount)
 }
 
 func pickAmount(amounts []SuggestedAmount, min float64, tolerance float64) (*SuggestedAmount, error) {
