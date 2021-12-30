@@ -52,7 +52,17 @@ type APIError struct {
 }
 
 func (e APIError) Empty() bool {
-	return e.ErrorCode == ""
+	return e.ErrorCode == "" && e.Message == ""
+}
+
+func (e APIError) AddStatus(status int) APIError {
+	e.StatusCode = status
+
+	if e.ErrorCode == "" {
+		e.ErrorCode = fmt.Sprint(status)
+	}
+
+	return e
 }
 
 func (e APIError) AsError() error {

@@ -49,8 +49,28 @@ func TestRequestGetReturnsErrors(t *testing.T) {
 	assert.Equal(t, e.ErrorCode, "INVALID_CREDENTIALS")
 }
 
-func TestRequestGetReturnsErrorsOnHttpError(t *testing.T) {
+func TestRequestGetReturnsErrorsWithoutErrorCode(t *testing.T) {
 
+	_, testSling := TestServer(func(w http.ResponseWriter, r *http.Request) {
+
+		w.WriteHeader(401)
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{"timeStamp": "2020-09-18T08:26:27.577+0000", "message": "Access Denied", "path": "/oauth/token", "errorCode": null, "infoLink": null, "details": []}`)
+	})
+
+	svc := &Service{}
+	resp := new(struct{ Bar string })
+	_, err := svc.request(testSling, "GET", "/foo", new(struct{}), resp)
+
+	assert.NotNil(t, err)
+	e, ok := err.(APIError)
+
+	assert.True(t, ok)
+	assert.NotNil(t, e)
+	assert.Equal(t, e.Error(), "401: Access Denied")
+}
+
+func TestRequestGetReturnsErrorsOnHttpError(t *testing.T) {
 	svc := &Service{}
 	resp := new(struct{ Bar string })
 	_, err := svc.request(sling.New().Client(&http.Client{}).Base("http://foo"), "GET", "/foo", new(struct{}), resp)

@@ -40,7 +40,7 @@ func (s *Service) request(sli *sling.Sling, method, path string, params interfac
 	status := httpResponse.StatusCode
 
 	if !apiError.Empty() {
-		apiError.StatusCode = status
+		apiError = apiError.AddStatus(status)
 		return httpResponse, apiError
 	}
 
