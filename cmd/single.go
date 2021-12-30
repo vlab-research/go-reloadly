@@ -52,7 +52,10 @@ var singleCmd = &cobra.Command{
 		} else {
 			t := svc.Topups()
 			res, err = t.AutoDetect(country).SuggestedAmount(tolerance).Topup(number, amount)
-			fmt.Println(fmt.Sprintf("Autodetected operator: %v", t.GetSetOperator().Name))
+			if err == nil {
+				fmt.Println(fmt.Sprintf("Autodetected operator: %v", t.GetSetOperator().Name))
+			}
+
 		}
 
 		if err != nil {
