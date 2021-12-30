@@ -1,7 +1,9 @@
 package reloadly
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -306,6 +308,25 @@ func TestOrder(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, int64(563), res.TransactionId)
 	assert.Equal(t, "test@test.com", res.RecipientEmail)
+}
+
+func TestOrderRequiresCertainFieldsAndNotOthers(t *testing.T) {
+	// does not require custom identifier
+	j := `{"productId": 157, "countryCode": "US", "quantity": 1, "UnitPrice": 5, "senderName": "John Doe", "recipientEmail": "test@test.com"}`
+
+	order := new(GiftCardOrder)
+	json.Unmarshal([]byte(j), &order)
+
+	validate := validator.New()
+	err := validate.Struct(order)
+	assert.Nil(t, err)
+
+	// requires productId
+	j = `{"countryCode": "US", "quantity": 1, "UnitPrice": 5, "senderName": "John Doe", "recipientEmail": "test@test.com"}`
+	order = new(GiftCardOrder)
+	json.Unmarshal([]byte(j), &order)
+	err = validate.Struct(order)
+	assert.NotNil(t, err)
 }
 
 func TestOrderReturnsError(t *testing.T) {

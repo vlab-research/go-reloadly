@@ -99,10 +99,10 @@ type GiftCardOrder struct {
 	CountryCode      string  `json:"countryCode" validate:"required"`
 	Quantity         int64   `json:"quantity" validate:"required"`
 	UnitPrice        float64 `json:"unitPrice" validate:"required"`
-	CustomIdentifier string  `json:"customIdentifier" validate:"required"`
+	CustomIdentifier string  `json:"customIdentifier"`
 	SenderName       string  `json:"senderName" validate:"required"`
 	RecipientEmail   string  `json:"recipientEmail" validate:"required"`
-	ID               string  `json:"id" validate:"required"`
+	ID               string  `json:"id"`
 }
 
 type Card struct {
