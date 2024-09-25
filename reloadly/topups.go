@@ -38,7 +38,7 @@ type TopupResponse struct {
 	OperatorTransactionID       string           `csv:"operatorTransactionId" json:"operatorTransactionId,omitempty"`
 	CustomIdentifier            string           `csv:"customIdentifier" json:"customIdentifier,omitempty"`
 	RecipientPhone              string           `csv:"recipientPhone" json:"recipientPhone,omitempty"`
-	RecipientEmail              string           `csv:"recipientEmail" json:"recipientEmail,omitempty"`
+	RecipientEmail              string           `csv:"recipientEmail" json:"recipientEmairrrrrrrrrl,omitempty"`
 	SenderPhone                 string           `csv:"senderPhone" json:"senderPhone,omitempty"`
 	CountryCode                 string           `csv:"countryCode" json:"countryCode,omitempty"`
 	OperatorID                  int64            `csv:"operatorId" json:"operatorId,omitempty"`
@@ -72,13 +72,14 @@ type TopupRequest struct {
 
 type TopupsService struct {
 	*Service
-	autoDetect      bool
-	suggestedAmount bool
-	autoFallback    bool
-	operator        *Operator
-	country         string
-	tolerance       float64
-	error           error
+	autoDetect       bool
+	suggestedAmount  bool
+	autoFallback     bool
+	operator         *Operator
+	country          string
+	tolerance        float64
+	error            error
+	customIdentifier string
 }
 
 func NewTopups() *Service {
@@ -95,7 +96,7 @@ func NewTopups() *Service {
 }
 
 func (s *Service) Topups() *TopupsService {
-	return &TopupsService{s, false, false, false, nil, "", 0.0, nil}
+	return &TopupsService{s, false, false, false, nil, "", 0.0, nil, ""}
 }
 
 func (s *TopupsService) New() *TopupsService {
@@ -136,7 +137,12 @@ func (s *TopupsService) AutoFallback() *TopupsService {
 	return s
 }
 
-func checkLocalRangeAmount(operator *Operator, amount float64) (float64, error) {
+func (s *TopupsService) CustomIdentifier(identifier string) *TopupsService {
+	s.customIdentifier = identifier
+	return s
+}
+
+func checkLocalRangeAmount(operator *Operator, amount float64, tolerance float64) (float64, error) {
 	min := operator.LocalMinAmount
 	max := operator.LocalMaxAmount
 
@@ -147,18 +153,32 @@ func checkLocalRangeAmount(operator *Operator, amount float64) (float64, error) 
 		return upper, nil
 	}
 
+	if amount < min && amount+tolerance >= min {
+		upper := min / operator.Fx.Rate
+		upper = math.Ceil(upper*100) / 100
+		return upper, nil
+	}
+
 	return 0, ReloadlyError{
 		ErrorCode: "IMPOSSIBLE_AMOUNT",
 		Message:   fmt.Sprintf("Operator %v has a minimum amount of %v and max of %v. Amount %v requested could not be fulfilled", operator.Name, min, max, amount),
 	}
 }
 
-func checkNonLocalRangeAmount(operator *Operator, amount float64) (float64, error) {
+func checkNonLocalRangeAmount(operator *Operator, amount float64, tolerance float64) (float64, error) {
+
 	min := operator.MinAmount
 	max := operator.MaxAmount
 
-	if amount >= min && amount <= max {
-		return amount, nil
+	converted := amount / operator.Fx.Rate
+	convertedTolerance := tolerance / operator.Fx.Rate
+
+	if converted >= min && converted <= max {
+		return converted, nil
+	}
+
+	if converted < min && converted+convertedTolerance >= min {
+		return min, nil
 	}
 
 	return 0, ReloadlyError{
@@ -167,12 +187,12 @@ func checkNonLocalRangeAmount(operator *Operator, amount float64) (float64, erro
 	}
 }
 
-func checkRangeAmount(operator *Operator, amount float64) (float64, error) {
+func checkRangeAmount(operator *Operator, amount float64, tolerance float64) (float64, error) {
 	if operator.SupportsLocalAmounts {
-		return checkLocalRangeAmount(operator, amount)
+		return checkLocalRangeAmount(operator, amount, tolerance)
 	}
 
-	return checkNonLocalRangeAmount(operator, amount)
+	return checkNonLocalRangeAmount(operator, amount, tolerance)
 }
 
 func pickAmount(amounts []SuggestedAmount, min float64, tolerance float64) (*SuggestedAmount, error) {
@@ -189,7 +209,9 @@ func pickAmount(amounts []SuggestedAmount, min float64, tolerance float64) (*Sug
 
 func GetSuggestedAmount(operator *Operator, amount float64, tolerance float64) (float64, error) {
 	if operator.DenominationType == "RANGE" {
-		return checkRangeAmount(operator, amount)
+
+		// ADD TOLERANCE
+		return checkRangeAmount(operator, amount, tolerance)
 	}
 
 	amounts := operator.SuggestedAmountsMap
@@ -265,6 +287,10 @@ func (s *TopupsService) Topup(mobile string, requestedAmount float64) (*TopupRes
 		RecipientPhone: &RecipientPhone{s.operator.Country.IsoName, mobile},
 		OperatorID:     s.operator.OperatorID,
 		Amount:         amount,
+	}
+
+	if s.customIdentifier != "" {
+		req.CustomIdentifier = s.customIdentifier
 	}
 
 	resp := new(TopupResponse)

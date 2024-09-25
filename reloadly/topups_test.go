@@ -257,10 +257,10 @@ func TestTopupBySuggestedAmountSendsAmountIfInRange(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestTopupBySuggestedAmountSendsAmountIfInRangeWithNonLocalAmount(t *testing.T) {
+func TestTopupBySuggestedAmountSendsAmountIfInRangeWithTolerance(t *testing.T) {
 
 	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request) {
-		expected := `{"recipientPhone":{"countryCode":"IN","number":"+123"},"operatorId":211,"amount":8}`
+		expected := `{"recipientPhone":{"countryCode":"IN","number":"+123"},"operatorId":211,"amount":0.58}`
 
 		data, _ := ioutil.ReadAll(r.Body)
 		dat := strings.TrimSpace(string(data))
@@ -277,11 +277,69 @@ func TestTopupBySuggestedAmountSendsAmountIfInRangeWithNonLocalAmount(t *testing
 		DenominationType:     "RANGE",
 		Country:              Country{"IN", "India"},
 		Fx:                   Fx{52.63, "INR"},
+		SupportsLocalAmounts: true,
+		LocalMinAmount:       30,
+		LocalMaxAmount:       50,
+	}
+	_, err := svc.Topups().SuggestedAmount(5).Operator(&op).Topup("+123", 25)
+
+	assert.Nil(t, err)
+}
+
+func TestTopupBySuggestedAmountSendsAmountIfInRangeWithNonLocalAmount(t *testing.T) {
+
+	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request) {
+		expected := `{"recipientPhone":{"countryCode":"IN","number":"+123"},"operatorId":211,"amount":0.16}`
+
+		data, _ := ioutil.ReadAll(r.Body)
+		dat := strings.TrimSpace(string(data))
+		assert.Equal(t, expected, dat)
+
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintf(w, `{"hey": "yeah"}`)
+	})
+
+	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
+	op := Operator{
+		OperatorID:           211,
+		Name:                 "Foodafone",
+		DenominationType:     "RANGE",
+		Country:              Country{"IN", "India"},
+		Fx:                   Fx{50, "INR"},
 		SupportsLocalAmounts: false,
 		MinAmount:            0,
 		MaxAmount:            10,
 	}
 	_, err := svc.Topups().SuggestedAmount(5).Operator(&op).Topup("+123", 8)
+
+	assert.Nil(t, err)
+}
+
+func TestTopupBySuggestedAmountSendsAmountIfInRangeWithNonLocalAmountAndTolerance(t *testing.T) {
+
+	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request) {
+		expected := `{"recipientPhone":{"countryCode":"IN","number":"+123"},"operatorId":211,"amount":2}`
+
+		data, _ := ioutil.ReadAll(r.Body)
+		dat := strings.TrimSpace(string(data))
+		assert.Equal(t, expected, dat)
+
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintf(w, `{"hey": "yeah"}`)
+	})
+
+	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
+	op := Operator{
+		OperatorID:           211,
+		Name:                 "Foodafone",
+		DenominationType:     "RANGE",
+		Country:              Country{"IN", "India"},
+		Fx:                   Fx{50, "INR"},
+		SupportsLocalAmounts: false,
+		MinAmount:            2,
+		MaxAmount:            5,
+	}
+	_, err := svc.Topups().SuggestedAmount(75).Operator(&op).Topup("+123", 50)
 
 	assert.Nil(t, err)
 }
@@ -333,6 +391,26 @@ func TestTopupWithAutoFallbackReCallsWithNewOperatorId(t *testing.T) {
 	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
 	op := Operator{Name: "Foodafone", OperatorID: 1, Country: Country{"IN", "India"}}
 	_, err := svc.Topups().Operator(&op).AutoFallback().Topup("+123", 100)
+
+	assert.Nil(t, err)
+}
+
+func TestTopupCustomIdentifierAddsIdentifier(t *testing.T) {
+
+	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request) {
+		expected := `{"recipientPhone":{"countryCode":"IN","number":"+123"},"operatorId":211,"amount":1.82,"customIdentifier":"foobar"}`
+
+		data, _ := ioutil.ReadAll(r.Body)
+		dat := strings.TrimSpace(string(data))
+		assert.Equal(t, expected, dat)
+
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintf(w, `{"hey": "yeah"}`)
+	})
+
+	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
+	op := getOperators()[5]
+	_, err := svc.Topups().SuggestedAmount(50).Operator(&op).CustomIdentifier("foobar").Topup("+123", 100)
 
 	assert.Nil(t, err)
 }

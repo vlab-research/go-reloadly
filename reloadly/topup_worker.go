@@ -44,12 +44,13 @@ func (j *TopupJob) UnmarshalJSON(b []byte) error {
 }
 
 type TopupJob struct {
-	Number    string  `csv:"number" json:"number" validate:"required"`
-	Amount    float64 `csv:"amount" json:"amount" validate:"required"`
-	Country   string  `csv:"country" json:"country" validate:"required"`
-	Tolerance float64 `csv:"tolerance,omitempty" json:"tolerance,omitempty"`
-	Operator  string  `csv:"operator,omitempty" json:"operator,omitempty"`
-	ID        string  `csv:"id,omitempty" json:"id,omitempty"`
+	Number           string  `csv:"number" json:"number" validate:"required"`
+	Amount           float64 `csv:"amount" json:"amount" validate:"required"`
+	Country          string  `csv:"country" json:"country" validate:"required"`
+	Tolerance        float64 `csv:"tolerance,omitempty" json:"tolerance,omitempty"`
+	Operator         string  `csv:"operator,omitempty" json:"operator,omitempty"`
+	ID               string  `csv:"id,omitempty" json:"id,omitempty"`
+	CustomIdentifier string  `csv:"custom_identifier,omitempty" json:"custom_identifier,omitempty"`
 }
 
 type TopupWorkerResponse struct {
@@ -85,16 +86,19 @@ func workErrorResponse(err error, d *TopupJob) *TopupWorkerResponse {
 func (t *TopupWorker) DoJob(d *TopupJob) (*TopupResponse, error) {
 	svc := Service(*t)
 
-	var err error
-	var res *TopupResponse
+	s := svc.Topups()
 
 	if d.Operator != "" {
-		res, err = svc.Topups().FindOperator(d.Country, d.Operator).SuggestedAmount(d.Tolerance).AutoFallback().Topup(d.Number, d.Amount)
+		s = s.FindOperator(d.Country, d.Operator).SuggestedAmount(d.Tolerance).AutoFallback()
 	} else {
-		res, err = svc.Topups().AutoDetect(d.Country).SuggestedAmount(d.Tolerance).Topup(d.Number, d.Amount)
+		s = s.AutoDetect(d.Country).SuggestedAmount(d.Tolerance)
 	}
 
-	return res, err
+	if d.CustomIdentifier != "" {
+		s = s.CustomIdentifier(d.CustomIdentifier)
+	}
+
+	return s.Topup(d.Number, d.Amount)
 }
 
 func (t *TopupWorker) Do(d *TopupJob) *TopupWorkerResponse {
