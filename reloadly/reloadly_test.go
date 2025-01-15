@@ -1,9 +1,9 @@
 package reloadly
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
-
 	"testing"
 
 	"github.com/dghubble/sling"
@@ -78,6 +78,26 @@ func TestRequestGetReturnsErrorsOnHttpError(t *testing.T) {
 	assert.NotNil(t, err)
 	_, ok := err.(APIError)
 	assert.False(t, ok)
+}
+
+func TestRequestGetReturnsSomethingReasonableWhenNotJSONResponse(t *testing.T) {
+
+	_, testSling := TestServer(func(w http.ResponseWriter, r *http.Request) {
+
+		w.WriteHeader(401)
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `<html> stupid response </html>`)
+	})
+
+	svc := &Service{}
+	resp := new(struct{ Bar string })
+	_, err := svc.request(testSling, "GET", "/foo", new(struct{}), resp)
+
+	// Note: this is the default, is it reasonable? Maybe needs improving.
+	e, ok := err.(*json.SyntaxError)
+
+	assert.True(t, ok)
+	assert.NotNil(t, e)
 }
 
 func TestRequestDoesReAuthOnErrorCodeTOKEN_EXPIRED(t *testing.T) {
