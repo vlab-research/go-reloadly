@@ -35,17 +35,22 @@ var operatorListCmd = &cobra.Command{
 		}
 
 		fmt.Printf("Operators for %s:\n", country)
-		fmt.Printf("%-8s %-30s %-15s %-10s %-10s %-10s\n", "ID", "Name", "Country", "Bundle", "Data", "Pin")
-		fmt.Printf("%-8s %-30s %-15s %-10s %-10s %-10s\n", "---", "----", "-------", "------", "----", "---")
+		fmt.Printf("%-8s %-30s %-15s %-14s %-10s %-10s %-20s\n", "ID", "Name", "Country", "Denomination", "Bundle", "Data", "FixedAmounts")
+		fmt.Printf("%-8s %-30s %-15s %-14s %-10s %-10s %-20s\n", "---", "----", "-------", "-------------", "------", "----", "------------")
 
 		for _, op := range operators {
-			fmt.Printf("%-8d %-30s %-15s %-10t %-10t %-10t\n",
+			fixed := ""
+			if op.DenominationType == "FIXED" && len(op.FixedAmounts) > 0 {
+				fixed = formatFixedAmounts(op.FixedAmounts, 5)
+			}
+			fmt.Printf("%-8d %-30s %-15s %-14s %-10t %-10t %-20s\n",
 				op.OperatorID,
 				truncateString(op.Name, 28),
 				op.Country.Name,
+				op.DenominationType,
 				op.Bundle,
 				op.Data,
-				op.Pin)
+				fixed)
 		}
 
 		fmt.Printf("\nTotal operators: %d\n", len(operators))
@@ -59,6 +64,30 @@ func truncateString(s string, maxLen int) string {
 		return s
 	}
 	return s[:maxLen-3] + "..."
+}
+
+// Helper to format fixed amounts, truncating if too many
+func formatFixedAmounts(amounts []float64, max int) string {
+	if len(amounts) == 0 {
+		return ""
+	}
+	end := len(amounts)
+	truncated := false
+	if max > 0 && len(amounts) > max {
+		end = max
+		truncated = true
+	}
+	str := ""
+	for i, amt := range amounts[:end] {
+		if i > 0 {
+			str += ", "
+		}
+		str += fmt.Sprintf("%.2f", amt)
+	}
+	if truncated {
+		str += ", ..."
+	}
+	return str
 }
 
 func init() {
