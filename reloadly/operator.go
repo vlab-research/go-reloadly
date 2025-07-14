@@ -121,3 +121,11 @@ func (s *TopupsService) SearchOperator(country, name string) (*Operator, error) 
 	}
 	return nil, err
 }
+
+func (s *TopupsService) GetOperatorByID(operatorID int64) (*Operator, error) {
+	path := fmt.Sprintf("/operators/%v", operatorID)
+	params := &OperatorsParams{SuggestedAmountsMap: true, SuggestedAmounts: true}
+	resp := new(Operator)
+	_, err := s.Request("GET", path, params, resp)
+	return resp, err
+}

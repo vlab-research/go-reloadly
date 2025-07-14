@@ -64,3 +64,22 @@ func TestSearchOperatorWhenNotFoundReturnsError(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, err.(ReloadlyError).ErrorCode, "OPERATOR_NOT_FOUND")
 }
+
+func TestGetOperatorByID(t *testing.T) {
+	dat, _ := ioutil.ReadFile("test/operator_single.json")
+	operator := string(dat)
+
+	ts, _ := TestServer(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/operators/186", r.URL.Path)
+
+		w.Header().Set("Content-Type", "application/com.reloadly.topups-v1+json")
+		fmt.Fprintf(w, operator)
+	})
+
+	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
+	res, err := svc.Topups().GetOperatorByID(186)
+
+	assert.Nil(t, err)
+	assert.Equal(t, "Reliance Jio India Bundles", res.Name)
+	assert.Equal(t, int64(186), res.OperatorID)
+}
