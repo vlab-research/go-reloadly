@@ -146,22 +146,30 @@ func checkLocalRangeAmount(operator *Operator, amount float64, tolerance float64
 	min := operator.LocalMinAmount
 	max := operator.LocalMaxAmount
 
-	// if valid, convertt it to payment currency
-	if amount >= min && amount <= max {
+	// Check if min/max are nil (not set)
+	if min == nil || max == nil {
+		return 0, ReloadlyError{
+			ErrorCode: "IMPOSSIBLE_AMOUNT",
+			Message:   fmt.Sprintf("Operator %v does not have local amount range configured", operator.Name),
+		}
+	}
+
+	// if valid, convert it to payment currency
+	if amount >= *min && amount <= *max {
 		upper := amount / operator.Fx.Rate
 		upper = math.Ceil(upper*100) / 100
 		return upper, nil
 	}
 
-	if amount < min && amount+tolerance >= min {
-		upper := min / operator.Fx.Rate
+	if amount < *min && amount+tolerance >= *min {
+		upper := *min / operator.Fx.Rate
 		upper = math.Ceil(upper*100) / 100
 		return upper, nil
 	}
 
 	return 0, ReloadlyError{
 		ErrorCode: "IMPOSSIBLE_AMOUNT",
-		Message:   fmt.Sprintf("Operator %v has a minimum amount of %v and max of %v. Amount %v requested could not be fulfilled", operator.Name, min, max, amount),
+		Message:   fmt.Sprintf("Operator %v has a minimum amount of %v and max of %v. Amount %v requested could not be fulfilled", operator.Name, *min, *max, amount),
 	}
 }
 
@@ -170,20 +178,28 @@ func checkNonLocalRangeAmount(operator *Operator, amount float64, tolerance floa
 	min := operator.MinAmount
 	max := operator.MaxAmount
 
+	// Check if min/max are nil (not set)
+	if min == nil || max == nil {
+		return 0, ReloadlyError{
+			ErrorCode: "IMPOSSIBLE_AMOUNT",
+			Message:   fmt.Sprintf("Operator %v does not have amount range configured", operator.Name),
+		}
+	}
+
 	converted := amount / operator.Fx.Rate
 	convertedTolerance := tolerance / operator.Fx.Rate
 
-	if converted >= min && converted <= max {
+	if converted >= *min && converted <= *max {
 		return converted, nil
 	}
 
-	if converted < min && converted+convertedTolerance >= min {
-		return min, nil
+	if converted < *min && converted+convertedTolerance >= *min {
+		return *min, nil
 	}
 
 	return 0, ReloadlyError{
 		ErrorCode: "IMPOSSIBLE_AMOUNT",
-		Message:   fmt.Sprintf("Operator %v has a minimum amount of %v and max of %v. Amount %v requested could not be fulfilled", operator.Name, min, max, amount),
+		Message:   fmt.Sprintf("Operator %v has a minimum amount of %v and max of %v. Amount %v requested could not be fulfilled", operator.Name, *min, *max, amount),
 	}
 }
 

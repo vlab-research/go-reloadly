@@ -83,3 +83,162 @@ func TestGetOperatorByID(t *testing.T) {
 	assert.Equal(t, "Reliance Jio India Bundles", res.Name)
 	assert.Equal(t, int64(186), res.OperatorID)
 }
+
+func TestGetFixedAmountsWithGeographicalPlans(t *testing.T) {
+	// Test operator with geographical recharge plans
+	op := &Operator{
+		SupportsGeographicalRechargePlans: true,
+		GeographicalRechargePlans: []GeographicalRechargePlan{
+			{
+				LocationCode: "HP",
+				LocationName: "Himachal Pradesh",
+				FixedAmounts: []float64{0.17, 2.0, 8.33, 16.67, 83.33},
+			},
+		},
+		FixedAmounts: []float64{1.0, 2.0, 3.0}, // Legacy amounts (should be ignored)
+	}
+
+	amounts := op.GetFixedAmounts()
+	expected := []float64{0.17, 2.0, 8.33, 16.67, 83.33}
+
+	if len(amounts) != len(expected) {
+		t.Errorf("Expected %d amounts, got %d", len(expected), len(amounts))
+	}
+
+	for i, amount := range amounts {
+		if amount != expected[i] {
+			t.Errorf("Expected amount %f at index %d, got %f", expected[i], i, amount)
+		}
+	}
+}
+
+func TestGetFixedAmountsWithoutGeographicalPlans(t *testing.T) {
+	// Test operator without geographical recharge plans
+	op := &Operator{
+		SupportsGeographicalRechargePlans: false,
+		FixedAmounts:                      []float64{1.0, 2.0, 3.0}, // Legacy amounts (should be used)
+	}
+
+	amounts := op.GetFixedAmounts()
+	expected := []float64{1.0, 2.0, 3.0}
+
+	if len(amounts) != len(expected) {
+		t.Errorf("Expected %d amounts, got %d", len(expected), len(amounts))
+	}
+
+	for i, amount := range amounts {
+		if amount != expected[i] {
+			t.Errorf("Expected amount %f at index %d, got %f", expected[i], i, amount)
+		}
+	}
+}
+
+func TestGetLocalFixedAmountsWithGeographicalPlans(t *testing.T) {
+	// Test operator with geographical recharge plans
+	op := &Operator{
+		SupportsGeographicalRechargePlans: true,
+		GeographicalRechargePlans: []GeographicalRechargePlan{
+			{
+				LocationCode: "HP",
+				LocationName: "Himachal Pradesh",
+				LocalAmounts: []float64{10.0, 120.0, 500.0, 1000.0, 5000.0},
+			},
+		},
+		LocalFixedAmounts: []float64{1.0, 2.0, 3.0}, // Legacy amounts (should be ignored)
+	}
+
+	amounts := op.GetLocalFixedAmounts()
+	expected := []float64{10.0, 120.0, 500.0, 1000.0, 5000.0}
+
+	if len(amounts) != len(expected) {
+		t.Errorf("Expected %d amounts, got %d", len(expected), len(amounts))
+	}
+
+	for i, amount := range amounts {
+		if amount != expected[i] {
+			t.Errorf("Expected amount %f at index %d, got %f", expected[i], i, amount)
+		}
+	}
+}
+
+func TestGetGeographicalPlanByLocationCode(t *testing.T) {
+	op := &Operator{
+		SupportsGeographicalRechargePlans: true,
+		GeographicalRechargePlans: []GeographicalRechargePlan{
+			{
+				LocationCode: "HP",
+				LocationName: "Himachal Pradesh",
+				FixedAmounts: []float64{0.17, 2.0, 8.33},
+			},
+			{
+				LocationCode: "DL",
+				LocationName: "Delhi",
+				FixedAmounts: []float64{1.0, 2.0, 3.0},
+			},
+		},
+	}
+
+	// Test finding existing plan
+	plan := op.GetGeographicalPlanByLocationCode("HP")
+	if plan == nil {
+		t.Error("Expected to find plan with location code HP")
+	}
+	if plan.LocationName != "Himachal Pradesh" {
+		t.Errorf("Expected location name 'Himachal Pradesh', got '%s'", plan.LocationName)
+	}
+
+	// Test finding non-existing plan
+	plan = op.GetGeographicalPlanByLocationCode("XX")
+	if plan != nil {
+		t.Error("Expected nil for non-existing location code")
+	}
+
+	// Test operator without geographical plans
+	op2 := &Operator{
+		SupportsGeographicalRechargePlans: false,
+	}
+	plan = op2.GetGeographicalPlanByLocationCode("HP")
+	if plan != nil {
+		t.Error("Expected nil for operator without geographical plans")
+	}
+}
+
+func TestGetDefaultGeographicalPlan(t *testing.T) {
+	op := &Operator{
+		SupportsGeographicalRechargePlans: true,
+		GeographicalRechargePlans: []GeographicalRechargePlan{
+			{
+				LocationCode: "HP",
+				LocationName: "Himachal Pradesh",
+				FixedAmounts: []float64{0.17, 2.0, 8.33},
+			},
+		},
+	}
+
+	plan := op.GetDefaultGeographicalPlan()
+	if plan == nil {
+		t.Error("Expected to get default plan")
+	}
+	if plan.LocationCode != "HP" {
+		t.Errorf("Expected location code 'HP', got '%s'", plan.LocationCode)
+	}
+
+	// Test operator without geographical plans
+	op2 := &Operator{
+		SupportsGeographicalRechargePlans: false,
+	}
+	plan = op2.GetDefaultGeographicalPlan()
+	if plan != nil {
+		t.Error("Expected nil for operator without geographical plans")
+	}
+
+	// Test operator with empty geographical plans
+	op3 := &Operator{
+		SupportsGeographicalRechargePlans: true,
+		GeographicalRechargePlans:         []GeographicalRechargePlan{},
+	}
+	plan = op3.GetDefaultGeographicalPlan()
+	if plan != nil {
+		t.Error("Expected nil for operator with empty geographical plans")
+	}
+}

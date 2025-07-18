@@ -48,23 +48,53 @@ var operatorInfoCmd = &cobra.Command{
 		fmt.Printf("  Commission: %.2f%%\n", operator.Commission)
 		fmt.Printf("  International Discount: %.2f%%\n", operator.InternationalDiscount)
 		fmt.Printf("  Local Discount: %.2f%%\n", operator.LocalDiscount)
-		fmt.Printf("  Most Popular Amount: %.2f\n", operator.MostPopularAmount)
-		fmt.Printf("  Most Popular Local Amount: %.2f\n", operator.MostPopularLocalAmount)
-		fmt.Printf("  Min Amount: %.2f\n", operator.MinAmount)
-		fmt.Printf("  Max Amount: %.2f\n", operator.MaxAmount)
-		fmt.Printf("  Local Min Amount: %.2f\n", operator.LocalMinAmount)
-		fmt.Printf("  Local Max Amount: %.2f\n", operator.LocalMaxAmount)
+
+		if operator.MostPopularAmount != nil {
+			fmt.Printf("  Most Popular Amount: %.2f\n", *operator.MostPopularAmount)
+		} else {
+			fmt.Printf("  Most Popular Amount: <not set>\n")
+		}
+
+		if operator.MostPopularLocalAmount != nil {
+			fmt.Printf("  Most Popular Local Amount: %.2f\n", *operator.MostPopularLocalAmount)
+		} else {
+			fmt.Printf("  Most Popular Local Amount: <not set>\n")
+		}
+
+		if operator.MinAmount != nil {
+			fmt.Printf("  Min Amount: %.2f\n", *operator.MinAmount)
+		} else {
+			fmt.Printf("  Min Amount: <not set>\n")
+		}
+
+		if operator.MaxAmount != nil {
+			fmt.Printf("  Max Amount: %.2f\n", *operator.MaxAmount)
+		} else {
+			fmt.Printf("  Max Amount: <not set>\n")
+		}
+
+		if operator.LocalMinAmount != nil {
+			fmt.Printf("  Local Min Amount: %.2f\n", *operator.LocalMinAmount)
+		} else {
+			fmt.Printf("  Local Min Amount: <not set>\n")
+		}
+
+		if operator.LocalMaxAmount != nil {
+			fmt.Printf("  Local Max Amount: %.2f\n", *operator.LocalMaxAmount)
+		} else {
+			fmt.Printf("  Local Max Amount: <not set>\n")
+		}
 
 		if operator.Fx.Rate > 0 {
 			fmt.Printf("  FX Rate: %.4f %s\n", operator.Fx.Rate, operator.Fx.CurrencyCode)
 		}
 
-		if len(operator.FixedAmounts) > 0 {
-			fmt.Printf("  Fixed Amounts: %v\n", operator.FixedAmounts)
+		if len(operator.GetFixedAmounts()) > 0 {
+			fmt.Printf("  Fixed Amounts: %v\n", operator.GetFixedAmounts())
 		}
 
-		if len(operator.LocalFixedAmounts) > 0 {
-			fmt.Printf("  Local Fixed Amounts: %v\n", operator.LocalFixedAmounts)
+		if len(operator.GetLocalFixedAmounts()) > 0 {
+			fmt.Printf("  Local Fixed Amounts: %v\n", operator.GetLocalFixedAmounts())
 		}
 
 		if len(operator.SuggestedAmounts) > 0 {

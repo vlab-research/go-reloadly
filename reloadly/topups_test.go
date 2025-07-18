@@ -164,12 +164,14 @@ func TestTopupBySuggestedAmountReturnsErrorOnAmountOutOfRange(t *testing.T) {
 	})
 
 	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
+	minAmount := float64(0)
+	maxAmount := float64(50)
 	op := Operator{
 		Name:                 "Foodafone",
 		DenominationType:     "RANGE",
 		SupportsLocalAmounts: true,
-		LocalMinAmount:       0,
-		LocalMaxAmount:       50,
+		LocalMinAmount:       &minAmount,
+		LocalMaxAmount:       &maxAmount,
 	}
 	_, err := svc.Topups().SuggestedAmount(50).Operator(&op).Topup("+123", 100)
 
@@ -193,12 +195,14 @@ func TestTopupBySuggestedAmountReturnsErrorOnAmountOutOfRangeNonLocalAmount(t *t
 	})
 
 	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
+	minAmount := float64(0)
+	maxAmount := float64(50)
 	op := Operator{
 		Name:                 "Foodafone",
 		DenominationType:     "RANGE",
 		SupportsLocalAmounts: false,
-		MinAmount:            0,
-		MaxAmount:            50,
+		MinAmount:            &minAmount,
+		MaxAmount:            &maxAmount,
 	}
 	_, err := svc.Topups().SuggestedAmount(50).Operator(&op).Topup("+123", 100)
 
@@ -242,6 +246,8 @@ func TestTopupBySuggestedAmountSendsAmountIfInRange(t *testing.T) {
 	})
 
 	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
+	minAmount := float64(0)
+	maxAmount := float64(50)
 	op := Operator{
 		OperatorID:           211,
 		Name:                 "Foodafone",
@@ -249,8 +255,8 @@ func TestTopupBySuggestedAmountSendsAmountIfInRange(t *testing.T) {
 		Country:              Country{"IN", "India"},
 		Fx:                   Fx{52.63, "INR"},
 		SupportsLocalAmounts: true,
-		LocalMinAmount:       0,
-		LocalMaxAmount:       50,
+		LocalMinAmount:       &minAmount,
+		LocalMaxAmount:       &maxAmount,
 	}
 	_, err := svc.Topups().SuggestedAmount(5).Operator(&op).Topup("+123", 25)
 
@@ -271,6 +277,8 @@ func TestTopupBySuggestedAmountSendsAmountIfInRangeWithTolerance(t *testing.T) {
 	})
 
 	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
+	minAmount := float64(30)
+	maxAmount := float64(50)
 	op := Operator{
 		OperatorID:           211,
 		Name:                 "Foodafone",
@@ -278,8 +286,8 @@ func TestTopupBySuggestedAmountSendsAmountIfInRangeWithTolerance(t *testing.T) {
 		Country:              Country{"IN", "India"},
 		Fx:                   Fx{52.63, "INR"},
 		SupportsLocalAmounts: true,
-		LocalMinAmount:       30,
-		LocalMaxAmount:       50,
+		LocalMinAmount:       &minAmount,
+		LocalMaxAmount:       &maxAmount,
 	}
 	_, err := svc.Topups().SuggestedAmount(5).Operator(&op).Topup("+123", 25)
 
@@ -300,6 +308,8 @@ func TestTopupBySuggestedAmountSendsAmountIfInRangeWithNonLocalAmount(t *testing
 	})
 
 	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
+	minAmount := float64(0)
+	maxAmount := float64(10)
 	op := Operator{
 		OperatorID:           211,
 		Name:                 "Foodafone",
@@ -307,8 +317,8 @@ func TestTopupBySuggestedAmountSendsAmountIfInRangeWithNonLocalAmount(t *testing
 		Country:              Country{"IN", "India"},
 		Fx:                   Fx{50, "INR"},
 		SupportsLocalAmounts: false,
-		MinAmount:            0,
-		MaxAmount:            10,
+		MinAmount:            &minAmount,
+		MaxAmount:            &maxAmount,
 	}
 	_, err := svc.Topups().SuggestedAmount(5).Operator(&op).Topup("+123", 8)
 
@@ -329,6 +339,8 @@ func TestTopupBySuggestedAmountSendsAmountIfInRangeWithNonLocalAmountAndToleranc
 	})
 
 	svc := &Service{BaseUrl: ts.URL, Client: &http.Client{}}
+	minAmount := float64(2)
+	maxAmount := float64(5)
 	op := Operator{
 		OperatorID:           211,
 		Name:                 "Foodafone",
@@ -336,8 +348,8 @@ func TestTopupBySuggestedAmountSendsAmountIfInRangeWithNonLocalAmountAndToleranc
 		Country:              Country{"IN", "India"},
 		Fx:                   Fx{50, "INR"},
 		SupportsLocalAmounts: false,
-		MinAmount:            2,
-		MaxAmount:            5,
+		MinAmount:            &minAmount,
+		MaxAmount:            &maxAmount,
 	}
 	_, err := svc.Topups().SuggestedAmount(75).Operator(&op).Topup("+123", 50)
 

@@ -40,8 +40,8 @@ var operatorListCmd = &cobra.Command{
 
 		for _, op := range operators {
 			fixed := ""
-			if op.DenominationType == "FIXED" && len(op.FixedAmounts) > 0 {
-				fixed = formatFixedAmounts(op.FixedAmounts, 5)
+			if op.DenominationType == "FIXED" && len(op.GetFixedAmounts()) > 0 {
+				fixed = formatFixedAmounts(op.GetFixedAmounts(), 5)
 			}
 			fmt.Printf("%-8d %-30s %-15s %-14s %-10t %-10t %-20s\n",
 				op.OperatorID,
