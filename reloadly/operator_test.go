@@ -242,3 +242,107 @@ func TestGetDefaultGeographicalPlan(t *testing.T) {
 		t.Error("Expected nil for operator with empty geographical plans")
 	}
 }
+
+func TestGetSuggestedAmountsMapWithGeographicalPlans(t *testing.T) {
+	// Test operator with geographical recharge plans and local amounts support
+	op := &Operator{
+		SupportsGeographicalRechargePlans: true,
+		SupportsLocalAmounts:              true,
+		Fx:                                Fx{Rate: 60.0, CurrencyCode: "INR"},
+		GeographicalRechargePlans: []GeographicalRechargePlan{
+			{
+				LocationCode: "HP",
+				LocationName: "Himachal Pradesh",
+				FixedAmounts: []float64{0.17, 2.0, 8.33, 16.67, 83.33},
+				LocalAmounts: []float64{10.0, 120.0, 500.0, 1000.0, 5000.0},
+			},
+		},
+		SuggestedAmountsMap: SuggestedAmountsMap{
+			{Pay: 1.0, Sent: 1.0},
+			{Pay: 2.0, Sent: 2.0},
+		}, // Legacy amounts (should be ignored)
+	}
+
+	amounts := op.GetSuggestedAmountsMap()
+	expectedLocalAmounts := []float64{10.0, 120.0, 500.0, 1000.0, 5000.0}
+	expectedUSDPay := []float64{10.0 / 60.0, 120.0 / 60.0, 500.0 / 60.0, 1000.0 / 60.0, 5000.0 / 60.0}
+
+	if len(amounts) != len(expectedLocalAmounts) {
+		t.Errorf("Expected %d amounts, got %d", len(expectedLocalAmounts), len(amounts))
+	}
+
+	for i, amount := range amounts {
+		expectedPay := expectedUSDPay[i]
+		expectedSent := expectedLocalAmounts[i]
+
+		if amount.Pay != expectedPay {
+			t.Errorf("Expected Pay amount %f at index %d, got %f", expectedPay, i, amount.Pay)
+		}
+		if amount.Sent != expectedSent {
+			t.Errorf("Expected Sent amount %f at index %d, got %f", expectedSent, i, amount.Sent)
+		}
+	}
+}
+
+func TestGetSuggestedAmountsMapWithGeographicalPlansUSDOnly(t *testing.T) {
+	// Test operator with geographical recharge plans but no local amounts support
+	op := &Operator{
+		SupportsGeographicalRechargePlans: true,
+		SupportsLocalAmounts:              false,
+		Fx:                                Fx{Rate: 60.0, CurrencyCode: "INR"},
+		GeographicalRechargePlans: []GeographicalRechargePlan{
+			{
+				LocationCode: "HP",
+				LocationName: "Himachal Pradesh",
+				FixedAmounts: []float64{0.17, 2.0, 8.33, 16.67, 83.33},
+				LocalAmounts: []float64{10.0, 120.0, 500.0, 1000.0, 5000.0},
+			},
+		},
+	}
+
+	amounts := op.GetSuggestedAmountsMap()
+	expectedUSDAmounts := []float64{0.17, 2.0, 8.33, 16.67, 83.33}
+
+	if len(amounts) != len(expectedUSDAmounts) {
+		t.Errorf("Expected %d amounts, got %d", len(expectedUSDAmounts), len(amounts))
+	}
+
+	for i, amount := range amounts {
+		expectedAmount := expectedUSDAmounts[i]
+
+		if amount.Pay != expectedAmount {
+			t.Errorf("Expected Pay amount %f at index %d, got %f", expectedAmount, i, amount.Pay)
+		}
+		if amount.Sent != expectedAmount {
+			t.Errorf("Expected Sent amount %f at index %d, got %f", expectedAmount, i, amount.Sent)
+		}
+	}
+}
+
+func TestGetSuggestedAmountsMapWithoutGeographicalPlans(t *testing.T) {
+	// Test operator without geographical recharge plans
+	op := &Operator{
+		SupportsGeographicalRechargePlans: false,
+		SuggestedAmountsMap: SuggestedAmountsMap{
+			{Pay: 1.0, Sent: 1.0},
+			{Pay: 2.0, Sent: 2.0},
+			{Pay: 3.0, Sent: 3.0},
+		}, // Legacy amounts (should be used)
+	}
+
+	amounts := op.GetSuggestedAmountsMap()
+	expected := []float64{1.0, 2.0, 3.0}
+
+	if len(amounts) != len(expected) {
+		t.Errorf("Expected %d amounts, got %d", len(expected), len(amounts))
+	}
+
+	for i, amount := range amounts {
+		if amount.Pay != expected[i] {
+			t.Errorf("Expected amount %f at index %d, got %f", expected[i], i, amount.Pay)
+		}
+		if amount.Sent != expected[i] {
+			t.Errorf("Expected sent amount %f at index %d, got %f", expected[i], i, amount.Sent)
+		}
+	}
+}

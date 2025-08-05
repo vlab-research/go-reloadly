@@ -35,22 +35,31 @@ var operatorListCmd = &cobra.Command{
 		}
 
 		fmt.Printf("Operators for %s:\n", country)
-		fmt.Printf("%-8s %-30s %-15s %-14s %-10s %-10s %-20s\n", "ID", "Name", "Country", "Denomination", "Bundle", "Data", "FixedAmounts")
-		fmt.Printf("%-8s %-30s %-15s %-14s %-10s %-10s %-20s\n", "---", "----", "-------", "-------------", "------", "----", "------------")
+		fmt.Printf("%-8s %-30s %-15s %-14s %-10s %-10s %-20s %-20s\n", "ID", "Name", "Country", "Denomination", "Bundle", "Data", "FixedAmounts(USD)", "LocalAmounts")
+		fmt.Printf("%-8s %-30s %-15s %-14s %-10s %-10s %-20s %-20s\n", "---", "----", "-------", "-------------", "------", "----", "------------------", "-------------")
 
 		for _, op := range operators {
 			fixed := ""
-			if op.DenominationType == "FIXED" && len(op.GetFixedAmounts()) > 0 {
-				fixed = formatFixedAmounts(op.GetFixedAmounts(), 5)
+			local := ""
+
+			if op.DenominationType == "FIXED" {
+				if len(op.GetFixedAmounts()) > 0 {
+					fixed = formatFixedAmounts(op.GetFixedAmounts(), 3)
+				}
+				if len(op.GetLocalFixedAmounts()) > 0 {
+					local = formatFixedAmounts(op.GetLocalFixedAmounts(), 3)
+				}
 			}
-			fmt.Printf("%-8d %-30s %-15s %-14s %-10t %-10t %-20s\n",
+
+			fmt.Printf("%-8d %-30s %-15s %-14s %-10t %-10t %-20s %-20s\n",
 				op.OperatorID,
 				truncateString(op.Name, 28),
 				op.Country.Name,
 				op.DenominationType,
 				op.Bundle,
 				op.Data,
-				fixed)
+				fixed,
+				local)
 		}
 
 		fmt.Printf("\nTotal operators: %d\n", len(operators))

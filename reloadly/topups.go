@@ -230,7 +230,8 @@ func GetSuggestedAmount(operator *Operator, amount float64, tolerance float64) (
 		return checkRangeAmount(operator, amount, tolerance)
 	}
 
-	amounts := operator.SuggestedAmountsMap
+	// Use our new helper method that handles geographical recharge plans
+	amounts := operator.GetSuggestedAmountsMap()
 	amt, err := pickAmount(amounts, amount, tolerance)
 
 	if err != nil {

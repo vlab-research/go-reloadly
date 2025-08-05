@@ -181,6 +181,47 @@ func (o *Operator) GetDefaultGeographicalPlan() *GeographicalRechargePlan {
 	return &o.GeographicalRechargePlans[0]
 }
 
+// GetSuggestedAmountsMap returns the appropriate suggested amounts map
+// This method maintains backward compatibility with the existing SuggestedAmountsMap field
+// For operators with geographical plans, it returns the map from the first available plan
+// Otherwise, it returns the legacy suggested amounts map
+func (o *Operator) GetSuggestedAmountsMap() SuggestedAmountsMap {
+	if o.SupportsGeographicalRechargePlans && len(o.GeographicalRechargePlans) > 0 {
+		plan := o.GeographicalRechargePlans[0]
+
+		// Determine which amounts to use based on SupportsLocalAmounts flag
+		var amounts []float64
+		if o.SupportsLocalAmounts && len(plan.LocalAmounts) > 0 {
+			// Use local amounts and convert to USD for the Pay field
+			amounts = plan.LocalAmounts
+		} else {
+			// Use USD amounts
+			amounts = plan.FixedAmounts
+		}
+
+		// Create a suggested amounts map from the amounts
+		suggestedAmounts := make(SuggestedAmountsMap, len(amounts))
+		for i, amount := range amounts {
+			if o.SupportsLocalAmounts && len(plan.LocalAmounts) > 0 {
+				// For local amounts: Pay = USD equivalent, Sent = local amount
+				usdEquivalent := amount / o.Fx.Rate
+				suggestedAmounts[i] = SuggestedAmount{
+					Pay:  usdEquivalent,
+					Sent: amount,
+				}
+			} else {
+				// For USD amounts: Pay = USD amount, Sent = USD amount
+				suggestedAmounts[i] = SuggestedAmount{
+					Pay:  amount,
+					Sent: amount,
+				}
+			}
+		}
+		return suggestedAmounts
+	}
+	return o.SuggestedAmountsMap
+}
+
 type OperatorsParams struct {
 	SuggestedAmounts    bool `url:"suggestedAmounts,omitempty"`
 	SuggestedAmountsMap bool `url:"suggestedAmountsMap,omitempty"`
